@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Speak English Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --surface: #0f0f1a;
+  --card: #14141f;
+  --card2: #1a1a2e;
+  --border: #ffffff0f;
+  --accent: #6c63ff;
+  --accent2: #ff6b9d;
+  --green: #00f5a0;
+  --yellow: #ffd60a;
+  --red: #ff4757;
+  --text: #f0f0ff;
+  --muted: #6b6b8a;
+  --radius: 20px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ANIMATED BG */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% -10%,#6c63ff18,transparent),radial-gradient(ellipse 60% 40% at 80% 110%,#ff6b9d12,transparent);pointer-events:none;z-index:0}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px}
+.nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
+.nav-logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{background:none;border:none;color:var(--muted);padding:8px 14px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.nav-tab.active{background:rgba(108,99,255,.15);color:var(--accent)}
+.nav-tab:hover:not(.active){color:var(--text)}
+
+/* PAGES */
+.page{display:none;min-height:100vh;padding-top:70px;position:relative;z-index:1}
+.page.active{display:block}
+
+/* CONTAINER */
+.container{max-width:900px;margin:0 auto;padding:24px 20px 100px}
+
+/* =================== FLASHCARDS PAGE =================== */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.stat-box .num{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-box .lbl{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+.progress-track{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:20px}
+.progress-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px;color:var(--muted)}
+.progress-top span:last-child{color:var(--accent);font-weight:700;font-family:'Space Mono',monospace}
+.bar{background:var(--border);border-radius:100px;height:6px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+.search-box{width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 18px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.search-box:focus{border-color:var(--accent)}
+.search-box::placeholder{color:var(--muted)}
+
+.cats{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:100px;font-size:12px;font-family:'Outfit',sans-serif;cursor:pointer;white-space:nowrap;transition:all .2s;font-weight:600}
+.cat:hover{border-color:var(--accent);color:var(--text)}
+.cat.on{background:linear-gradient(135deg,var(--accent),#8b5cf6);border-color:transparent;color:#fff;font-weight:700}
+
+/* FLASHCARD */
+.flashcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:30px;margin-bottom:16px;position:relative;overflow:hidden}
+.flashcard::after{content:'';position:absolute;top:-80px;right:-80px;width:250px;height:250px;background:radial-gradient(circle,rgba(108,99,255,.07),transparent 70%);pointer-events:none}
+.fc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.fc-cat{background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);color:var(--accent);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:100px}
+.fc-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+
+/* KARAOKE DISPLAY */
+.karaoke-wrap{margin-bottom:8px}
+.karaoke-phrase{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.k-word{font-family:'Outfit',sans-serif;font-size:clamp(22px,4vw,34px);font-weight:800;transition:all .3s;cursor:default;border-radius:6px;padding:2px 4px}
+.k-word.idle{color:var(--text)}
+.k-word.active{color:var(--accent);text-shadow:0 0 20px rgba(108,99,255,.6);transform:scale(1.05)}
+.k-word.good{color:var(--green)}
+.k-word.ok{color:var(--yellow)}
+.k-word.bad{color:var(--red)}
+
+.fc-pron{font-size:14px;color:var(--accent2);font-style:italic;margin-bottom:12px}
+.fc-es{font-size:17px;color:var(--muted);font-weight:300;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border)}
+.fc-es strong{color:var(--text);font-weight:500}
+
+.tip-box{background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.15);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:10px}
+.tip-icon{font-size:18px;flex-shrink:0}
+.tip-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:3px}
+.tip-txt{font-size:13px;color:#c0c0d8;line-height:1.5}
+
+.ex-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ex{background:var(--card2);border-radius:10px;padding:12px 14px;margin-bottom:7px;border-left:3px solid var(--accent2)}
+.ex-en{font-weight:600;font-size:14px;margin-bottom:2px}
+.ex-es{font-size:12px;color:var(--muted);font-style:italic}
+
+/* PRONUNCIATION RESULT */
+.pronun-result{background:var(--card2);border-radius:14px;padding:16px;margin-top:16px;display:none}
+.pronun-result.show{display:block}
+.score-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.score-circle{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;flex-shrink:0;border:3px solid}
+.score-circle.great{border-color:var(--green);color:var(--green);background:rgba(0,245,160,.08)}
+.score-circle.good{border-color:var(--yellow);color:var(--yellow);background:rgba(255,214,10,.08)}
+.score-circle.bad{border-color:var(--red);color:var(--red);background:rgba(255,71,87,.08)}
+.score-msg{font-size:14px;line-height:1.5}
+.score-msg strong{display:block;font-size:16px;margin-bottom:3px}
+.word-scores{display:flex;flex-wrap:wrap;gap:6px}
+.ws{padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600}
+.ws.great{background:rgba(0,245,160,.15);color:var(--green)}
+.ws.good{background:rgba(255,214,10,.15);color:var(--yellow)}
+.ws.bad{background:rgba(255,71,87,.15);color:var(--red)}
+
+/* CONTROLS */
+.controls{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.btn{flex:1;min-width:100px;padding:13px 16px;border-radius:13px;border:none;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-know{background:linear-gradient(135deg,var(--green),#00c9a7);color:#000}
+.btn-know:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,245,160,.3)}
+.btn-hard{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn-hard:hover{border-color:var(--accent2);transform:translateY(-2px)}
+.btn-mic{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;flex:0;padding:13px 18px;position:relative;overflow:hidden}
+.btn-mic.recording{animation:pulse-mic 1s infinite}
+.btn-mic:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,99,255,.4)}
+.btn-speak{background:rgba(255,107,157,.1);color:var(--accent2);border:1px solid rgba(255,107,157,.2);flex:0;padding:13px 18px}
+.btn-speak:hover{background:rgba(255,107,157,.2);transform:translateY(-2px)}
+.btn-prev{background:var(--card2);color:var(--muted);border:1px solid var(--border);flex:0;padding:13px 14px}
+.btn-prev:hover{color:var(--text);transform:translateY(-2px)}
+@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(108,99,255,.5)}50%{box-shadow:0 0 0 12px rgba(108,99,255,0)}}
+
+.mic-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:10px}
+
+/* SIDE CARDS */
+.side-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.side-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.side-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.streak-big{font-family:'Space Mono',monospace;font-size:38px;font-weight:700;background:linear-gradient(135deg,var(--yellow),#ff9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.streak-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.mini-list{list-style:none}
+.mini-list li{font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--muted);display:flex;justify-content:space-between}
+.mini-list li:last-child{border-bottom:none}
+.mini-list li span{color:var(--green);font-size:10px;font-weight:700}
+
+/* =================== DIALOGUE PAGE =================== */
+.situations-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.sit-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;transition:all .25s}
+.sit-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.sit-card.active-sit{background:rgba(108,99,255,.1);border-color:var(--accent)}
+.sit-icon{font-size:32px;margin-bottom:8px}
+.sit-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.sit-desc{font-size:11px;color:var(--muted)}
+
+.dialogue-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;display:none}
+.dialogue-box.show{display:block}
+.dialogue-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.dialogue-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.dialogue-info strong{display:block;font-size:15px;font-weight:700}
+.dialogue-info span{font-size:12px;color:var(--muted)}
+.dialogue-level{margin-left:auto;background:rgba(108,99,255,.15);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px}
+
+.chat-area{height:340px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;padding-right:4px}
+.chat-area::-webkit-scrollbar{width:4px}
+.chat-area::-webkit-scrollbar-track{background:transparent}
+.chat-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.bubble{max-width:80%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.5;animation:bubbleIn .3s ease}
+.bubble.them{background:var(--card2);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.bubble.me{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.bubble.me .bubble-trans{font-size:11px;opacity:.75;margin-top:4px}
+.bubble.them .bubble-trans{font-size:11px;color:var(--muted);margin-top:4px}
+.bubble-hint{font-size:11px;color:var(--accent);margin-top:4px;font-style:italic}
+.typing{display:flex;gap:5px;padding:14px 16px;background:var(--card2);border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;align-self:flex-start;width:60px}
+.typing span{width:7px;height:7px;background:var(--muted);border-radius:50%;animation:typing .8s infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1);opacity:1}}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.suggestions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.sug{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.sug:hover{border-color:var(--accent);color:var(--accent)}
+
+.chat-input-row{display:flex;gap:10px}
+.chat-input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:13px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:var(--accent)}
+.chat-input::placeholder{color:var(--muted)}
+.btn-send{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;padding:13px 18px;border-radius:13px;cursor:pointer;font-size:18px;transition:all .2s}
+.btn-send:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(108,99,255,.4)}
+.btn-mic-chat{background:var(--card2);border:1px solid var(--border);color:var(--accent2);padding:13px 16px;border-radius:13px;cursor:pointer;font-size:18px;transition:all .2s}
+.btn-mic-chat.recording{background:rgba(255,107,157,.15);border-color:var(--accent2);animation:pulse-mic 1s infinite}
+.btn-mic-chat:hover{border-color:var(--accent2)}
+
+.score-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700;margin-top:5px}
+.score-badge.great{background:rgba(0,245,160,.15);color:var(--green)}
+.score-badge.good{background:rgba(255,214,10,.15);color:var(--yellow)}
+.score-badge.bad{background:rgba(255,71,87,.15);color:var(--red)}
+
+/* =================== TOAST =================== */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#000;font-weight:700;padding:12px 26px;border-radius:100px;font-size:14px;transition:transform .4s cubic-bezier(.4,0,.2,1);z-index:200;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.bad{background:var(--accent2);color:#fff}
+.toast.info{background:var(--accent);color:#fff}
+
+/* ANIMATIONS */
+@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.flashcard.anim{animation:slideIn .3s ease forwards}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty h3{font-size:20px;margin-bottom:8px;color:var(--text)}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .situations-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .side-grid{grid-template-columns:1fr}
+  .flashcard{padding:22px 18px}
+  .controls{gap:7px}
+  .btn{font-size:13px;padding:11px 12px}
+  .nav-tab span{display:none}
+  .nav-tab{padding:8px 10px}
+}
+
+/* =================== MY PHRASES PAGE =================== */
+.mp-hero{background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(255,107,157,.08));border:1px solid rgba(108,99,255,.2);border-radius:20px;padding:28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.mp-hero-icon{font-size:48px;flex-shrink:0}
+.mp-hero h2{font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px}
+.mp-hero p{color:var(--muted);font-size:14px;line-height:1.5}
+
+.add-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:24px}
+.add-card h3{font-size:16px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+.ai-input-wrap{position:relative;margin-bottom:14px}
+.ai-input{width:100%;background:var(--card2);border:2px solid var(--border);border-radius:14px;padding:16px 56px 16px 18px;color:var(--text);font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;outline:none;transition:border-color .2s}
+.ai-input:focus{border-color:var(--accent)}
+.ai-input::placeholder{color:var(--muted);font-weight:400}
+.ai-input-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none}
+
+.ai-generating{display:none;align-items:center;gap:10px;padding:14px 18px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:12px;margin-bottom:14px;font-size:13px;color:var(--accent)}
+.ai-generating.show{display:flex}
+.ai-spin{width:18px;height:18px;border:2px solid rgba(108,99,255,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.preview-card{background:var(--card2);border:1px solid rgba(108,99,255,.25);border-radius:16px;padding:20px;margin-bottom:14px;display:none}
+.preview-card.show{display:block}
+.preview-en{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px}
+.preview-pron{font-size:13px;color:var(--accent2);font-style:italic;margin-bottom:8px}
+.preview-es{font-size:15px;color:var(--muted);margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.preview-tip{font-size:13px;color:#c0c0d8;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.15);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.preview-exs .ex{margin-bottom:7px}
+
+.cat-select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;margin-bottom:14px;cursor:pointer}
+.cat-select:focus{border-color:var(--accent)}
+
+.btn-add-confirm{width:100%;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;padding:15px;border-radius:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-add-confirm:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,99,255,.4)}
+.btn-add-confirm:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* MY PHRASES LIST */
+.mp-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.mp-count{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);flex:1}
+.mp-count strong{color:var(--accent)}
+.btn-export{background:var(--card);border:1px solid var(--border);color:var(--text);padding:9px 16px;border-radius:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-export:hover{border-color:var(--green);color:var(--green)}
+.btn-import-label{background:var(--card);border:1px solid var(--border);color:var(--text);padding:9px 16px;border-radius:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-import-label:hover{border-color:var(--accent);color:var(--accent)}
+
+.mp-filter-btns{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.mp-filter-btns::-webkit-scrollbar{display:none}
+.mpf-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:100px;font-size:12px;font-family:'Outfit',sans-serif;cursor:pointer;white-space:nowrap;transition:all .2s;font-weight:600}
+.mpf-btn:hover{border-color:var(--accent);color:var(--text)}
+.mpf-btn.on{background:linear-gradient(135deg,var(--accent),#8b5cf6);border-color:transparent;color:#fff;font-weight:700}
+
+.mp-phrase-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;transition:border-color .2s}
+.mp-phrase-card:hover{border-color:rgba(108,99,255,.3)}
+.mp-phrase-card::before{content:'✨';position:absolute;top:16px;right:50px;font-size:11px;background:rgba(108,99,255,.15);color:var(--accent);padding:3px 8px;border-radius:100px;font-style:normal;font-family:'Outfit',sans-serif;font-weight:700;letter-spacing:.5px}
+.mp-card-en{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px}
+.mp-card-pron{font-size:12px;color:var(--accent2);font-style:italic;margin-bottom:6px}
+.mp-card-es{font-size:14px;color:var(--muted);margin-bottom:10px}
+.mp-card-tip{font-size:12px;color:#a0a0c0;background:rgba(0,245,160,.05);border-left:2px solid var(--green);padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:10px}
+.mp-card-exs{display:flex;flex-direction:column;gap:5px}
+.mp-card-ex{font-size:12px;background:var(--card2);padding:8px 12px;border-radius:8px;border-left:2px solid var(--accent2)}
+.mp-card-ex-es{font-size:11px;color:var(--muted);font-style:italic;margin-top:2px}
+.mp-card-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.mp-btn-practice{flex:1;background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(139,92,246,.15));border:1px solid rgba(108,99,255,.2);color:var(--accent);padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.mp-btn-practice:hover{background:rgba(108,99,255,.25)}
+.mp-btn-delete{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.15);color:var(--red);padding:9px 14px;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s}
+.mp-btn-delete:hover{background:rgba(255,71,87,.2)}
+
+.mp-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.mp-empty .mp-empty-icon{font-size:56px;margin-bottom:16px}
+.mp-empty h3{font-size:20px;color:var(--text);margin-bottom:8px;font-weight:700}
+.mp-empty p{font-size:14px;line-height:1.6}
+
+/* PRACTICE MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:32px;max-width:520px;width:100%;position:relative;animation:modalIn .3s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--card2);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{color:var(--text);background:var(--border)}
+
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">⚡ SpeakPro</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('flashcards')">🃏 <span>Frases</span></button>
+      <button class="nav-tab" onclick="showPage('dialogue')">🗣️ <span>Diálogos</span></button>
+      <button class="nav-tab" onclick="showPage('myphrases')">✨ <span>Mis Frases</span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== FLASHCARDS PAGE ===================== -->
+<div class="page active" id="page-flashcards">
+  <div class="container">
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="num" id="s-learned">0</div><div class="lbl">Aprendidas ✅</div></div>
+      <div class="stat-box"><div class="num" id="s-total">0</div><div class="lbl">Total</div></div>
+      <div class="stat-box"><div class="num" id="s-streak">0</div><div class="lbl">Racha 🔥</div></div>
+      <div class="stat-box"><div class="num" id="s-score">-</div><div class="lbl">Pron. 🎤</div></div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-top"><span>Progreso total</span><span id="prog-txt">0 / 0</span></div>
+      <div class="bar"><div class="bar-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <input class="search-box" id="searchInput" placeholder="🔍 Buscar frase en inglés o español..." oninput="handleSearch()">
+
+    <div class="cats" id="cats"></div>
+
+    <div id="empty-state" class="empty" style="display:none">
+      <h3>Sin resultados</h3>
+      <p>Intenta con otra palabra</p>
+    </div>
+
+    <div class="flashcard" id="fc">
+      <div class="fc-top">
+        <div class="fc-cat" id="fc-cat">🎯</div>
+        <div class="fc-num" id="fc-num">1/1</div>
+      </div>
+
+      <!-- KARAOKE DISPLAY -->
+      <div class="karaoke-wrap">
+        <div class="karaoke-phrase" id="karaoke-phrase"></div>
+      </div>
+
+      <div class="fc-pron" id="fc-pron">🔊 ...</div>
+      <div class="fc-es" id="fc-es"></div>
+
+      <div class="tip-box">
+        <div class="tip-icon">💡</div>
+        <div><div class="tip-lbl">Truco de memoria</div><div class="tip-txt" id="fc-tip"></div></div>
+      </div>
+
+      <div class="ex-title">Úsala en conversación:</div>
+      <div id="fc-exs"></div>
+
+      <!-- PRONUNCIATION RESULT -->
+      <div class="pronun-result" id="pronun-result">
+        <div class="score-row">
+          <div class="score-circle" id="score-circle">-</div>
+          <div class="score-msg" id="score-msg"></div>
+        </div>
+        <div class="word-scores" id="word-scores"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-prev" onclick="prevCard()">◀</button>
+        <button class="btn btn-speak" onclick="speakPhrase()" title="Escuchar">🔊</button>
+        <button class="btn btn-mic" id="mic-btn" onclick="toggleMic()" title="Pronunciar">🎤</button>
+        <button class="btn btn-hard" onclick="markHard()">😅 Repasar</button>
+        <button class="btn btn-know" onclick="markKnown()">✅ ¡Ya la sé!</button>
+      </div>
+      <div class="mic-hint" id="mic-hint">Toca 🎤 para practicar tu pronunciación con karaoke</div>
+    </div>
+
+    <div class="side-grid">
+      <div class="side-card">
+        <div class="side-title">🔥 Racha actual</div>
+        <div class="streak-big" id="streak-big">0</div>
+        <div class="streak-sub">frases correctas seguidas</div>
+      </div>
+      <div class="side-card">
+        <div class="side-title">📋 Para repasar</div>
+        <ul class="mini-list" id="review-list"><li>Nada aún 🎉<span></span></li></ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== DIALOGUE PAGE ===================== -->
+<div class="page" id="page-dialogue">
+  <div class="container">
+
+    <div style="margin-bottom:24px">
+      <div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px">🗣️ Conversación Real</div>
+      <div style="color:var(--muted);font-size:14px">Elige una situación y habla con una persona virtual en inglés</div>
+    </div>
+
+    <div class="situations-grid" id="sit-grid"></div>
+
+    <div class="dialogue-box" id="dialogue-box">
+      <div class="dialogue-header">
+        <div class="dialogue-avatar" id="d-avatar"></div>
+        <div class="dialogue-info">
+          <strong id="d-name"></strong>
+          <span id="d-role"></span>
+        </div>
+        <div class="dialogue-level" id="d-level">Básico</div>
+      </div>
+
+      <div class="chat-area" id="chat-area"></div>
+
+      <div class="suggestions" id="suggestions"></div>
+
+      <div class="chat-input-row">
+        <button class="btn-mic-chat" id="mic-chat-btn" onclick="toggleMicChat()" title="Hablar">🎤</button>
+        <input class="chat-input" id="chat-input" placeholder="Escribe en inglés o toca 🎤..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn-send" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const phrases = [
+  { category:"👋 Saludos", en:"What's up?", pron:"WATS ap", es:"¿Qué hay? / ¿Qué tal?", tip:"Imagina a alguien mirando hacia arriba (UP) preguntando qué pasa.", examples:[{en:"Hey! What's up?",es:"¡Oye! ¿Qué hay?"},{en:"What's up? Everything okay?",es:"¿Qué tal? ¿Todo bien?"}] },
+  { category:"👋 Saludos", en:"How's it going?", pron:"JAUS it GOH-ing", es:"¿Cómo va todo?", tip:"IT GOING = eso yendo. Más relajado que 'How are you?'", examples:[{en:"Hey! How's it going?",es:"¡Oye! ¿Cómo va todo?"},{en:"How's it going at work?",es:"¿Cómo va el trabajo?"}] },
+  { category:"👋 Saludos", en:"Nice to meet you!", pron:"NAIS tu MIT yu", es:"¡Mucho gusto conocerte!", tip:"NICE = agradable. Conocerte fue 'nice'.", examples:[{en:"Hi, I'm Ana. Nice to meet you!",es:"Hola, soy Ana. ¡Mucho gusto!"},{en:"Nice to meet you too!",es:"¡Igualmente!"}] },
+  { category:"👋 Saludos", en:"Good to see you!", pron:"GUD tu SI yu", es:"¡Qué bueno verte!", tip:"GOOD TO SEE = bueno ver. Simple y directo.", examples:[{en:"Good to see you again!",es:"¡Qué bueno verte de nuevo!"},{en:"Wow, good to see you!",es:"¡Qué bueno verte!"}] },
+  { category:"👋 Saludos", en:"Take care!", pron:"teik KER", es:"¡Cuídate!", tip:"TAKE CARE = tomar cuidado = cuídate. Clásica al despedirse.", examples:[{en:"Bye! Take care!",es:"¡Adiós! ¡Cuídate!"},{en:"It was great seeing you. Take care!",es:"Fue genial verte. ¡Cuídate!"}] },
+  { category:"👋 Saludos", en:"See you later!", pron:"SI yu LEI-ter", es:"¡Hasta luego!", tip:"SEE YOU = te veo. LATER = luego. 'Te veo luego'.", examples:[{en:"I gotta go. See you later!",es:"Tengo que irme. ¡Hasta luego!"},{en:"See you later!",es:"¡Hasta luego!"}] },
+  { category:"👋 Saludos", en:"What's new?", pron:"WATS niu", es:"¿Qué hay de nuevo?", tip:"NEW = nuevo. ¿Qué es NUEVO en tu vida?", examples:[{en:"Hey! What's new?",es:"¡Oye! ¿Qué hay de nuevo?"},{en:"Not much, what's new with you?",es:"No mucho, ¿y tú?"}] },
+  { category:"👋 Saludos", en:"How are things?", pron:"JAU ar ZINGS", es:"¿Cómo van las cosas?", tip:"THINGS = cosas. Casual y amigable.", examples:[{en:"Hi! How are things?",es:"¡Hola! ¿Cómo van las cosas?"},{en:"How are things at home?",es:"¿Cómo están las cosas en casa?"}] },
+  { category:"💬 Conversación", en:"I have no idea.", pron:"ai JAV no ai-DI-a", es:"No tengo ni idea.", tip:"IDEA suena igual en español. Solo agrega 'I have no'.", examples:[{en:"Where did she go? — I have no idea.",es:"¿A dónde fue? — Ni idea."},{en:"I have no idea what to eat.",es:"No tengo ni idea qué comer."}] },
+  { category:"💬 Conversación", en:"It depends.", pron:"it di-PENDS", es:"Depende.", tip:"De-PENDS. Casi como 'depende' en español.", examples:[{en:"Is it expensive? — It depends.",es:"¿Es caro? — Depende."},{en:"It depends on the weather.",es:"Depende del clima."}] },
+  { category:"💬 Conversación", en:"That makes sense.", pron:"DAT meiks SENS", es:"Eso tiene sentido.", tip:"SENSE existe en español. MAKES SENSE = hace sentido.", examples:[{en:"She was tired. That makes sense.",es:"Estaba cansada. Tiene sentido."},{en:"Oh! That makes sense now.",es:"¡Ahora tiene sentido!"}] },
+  { category:"💬 Conversación", en:"Sounds good!", pron:"SAUNDS gud", es:"¡Suena bien! / ¡Me parece bien!", tip:"SOUNDS = suena. GOOD = bien. La forma cool de decir 'de acuerdo'.", examples:[{en:"Let's meet at 6. — Sounds good!",es:"Nos vemos a las 6. — ¡Suena bien!"},{en:"Sounds good to me!",es:"¡Me parece bien!"}] },
+  { category:"💬 Conversación", en:"My bad!", pron:"mai BAD", es:"¡Fue mi culpa!", tip:"BAD = malo. MY BAD = fue mi error. Muy informal.", examples:[{en:"I forgot the keys. My bad!",es:"Olvidé las llaves. ¡Fue mi culpa!"},{en:"Sorry, my bad!",es:"Perdón, ¡fue mi error!"}] },
+  { category:"💬 Conversación", en:"No worries!", pron:"no WO-ris", es:"¡No te preocupes!", tip:"WORRIES = preocupaciones. NO WORRIES = sin preocupaciones.", examples:[{en:"Sorry I'm late. — No worries!",es:"Perdón por el retraso. — ¡No te preocupes!"},{en:"No worries, take your time.",es:"Sin problema, tómate tu tiempo."}] },
+  { category:"💬 Conversación", en:"Fair enough.", pron:"FER e-NOF", es:"Está bien. / Me parece justo.", tip:"FAIR = justo. ENOUGH = suficiente. 'Es suficientemente justo'.", examples:[{en:"I'll pay half. — Fair enough.",es:"Pago la mitad. — Me parece justo."},{en:"Fair enough, let's do it.",es:"Está bien, hagámoslo."}] },
+  { category:"💬 Conversación", en:"To be honest...", pron:"tu bi O-nest", es:"Para ser honesto...", tip:"HONEST = honesto (casi igual). Úsala antes de decir algo sincero.", examples:[{en:"To be honest, I didn't like the movie.",es:"Para ser honesto, no me gustó."},{en:"To be honest, I'm not sure.",es:"Sinceramente, no estoy seguro."}] },
+  { category:"💬 Conversación", en:"You know what I mean?", pron:"yu NO wat ai MIN", es:"¿Sabes lo que digo?", tip:"MEAN = querer decir. ¿Sabes qué quiero decir?", examples:[{en:"It's complicated, you know what I mean?",es:"Es complicado, ¿me entiendes?"},{en:"I'm tired of it, you know what I mean?",es:"Estoy cansado, ¿sabes lo que digo?"}] },
+  { category:"💬 Conversación", en:"What do you think?", pron:"WAT du yu ZINK", es:"¿Qué piensas? / ¿Qué opinas?", tip:"THINK = pensar. La usas constantemente en conversaciones.", examples:[{en:"I'm thinking of changing jobs. What do you think?",es:"Pienso cambiar de trabajo. ¿Qué piensas?"},{en:"What do you think about this?",es:"¿Qué opinas de esto?"}] },
+  { category:"💬 Conversación", en:"Long story short...", pron:"LONG STO-ri SHORT", es:"En resumen...", tip:"Historia larga, corta. Para resumir sin todos los detalles.", examples:[{en:"Long story short, I quit my job.",es:"En resumen, renuncié."},{en:"Long story short, we got lost.",es:"Para hacer el cuento corto, nos perdimos."}] },
+  { category:"💬 Conversación", en:"Just kidding!", pron:"JAST KID-ing", es:"¡Es broma!", tip:"KIDDING = bromeando. JUST KIDDING = solo bromeando.", examples:[{en:"You have spinach in your teeth... just kidding!",es:"Tienes espinaca... ¡es broma!"},{en:"I quit! — Just kidding!",es:"¡Renuncio! — ¡Es broma!"}] },
+  { category:"💬 Conversación", en:"Seriously?!", pron:"SI-rios-li", es:"¿En serio?!", tip:"SERIOUS = serio. SERIOUSLY = en serio. Para sorpresa.", examples:[{en:"I got the job! — Seriously?!",es:"¡Conseguí el trabajo! — ¿En serio?!"},{en:"He said WHAT? Seriously?",es:"¿Dijo QUÉ? ¿En serio?"}] },
+  { category:"💬 Conversación", en:"I get it.", pron:"ai GUET it", es:"Entiendo. / Lo capto.", tip:"GET = entender (informal). Más casual que 'I understand'.", examples:[{en:"Oh, I get it now. Thanks!",es:"Ah, ahora entiendo. ¡Gracias!"},{en:"I get it, you're busy.",es:"Entiendo, estás ocupado."}] },
+  { category:"💬 Conversación", en:"By the way...", pron:"bai da WEI", es:"Por cierto... / A propósito...", tip:"BY THE WAY = a propósito. Para agregar info o cambiar de tema.", examples:[{en:"By the way, did you hear about the party?",es:"Por cierto, ¿escuchaste lo de la fiesta?"},{en:"Oh, by the way, I forgot to tell you.",es:"Ah, a propósito, olvidé contarte."}] },
+  { category:"💬 Conversación", en:"At the end of the day...", pron:"at da END ov da DEI", es:"Al final del día... / A fin de cuentas...", tip:"Para expresar lo más importante al terminar los argumentos.", examples:[{en:"At the end of the day, it's your decision.",es:"Al final del día, es tu decisión."},{en:"At the end of the day, what matters is happiness.",es:"A fin de cuentas, lo que importa es ser feliz."}] },
+  { category:"💬 Conversación", en:"It is what it is.", pron:"it is WAT it IS", es:"Es lo que es. / Así son las cosas.", tip:"Filosofía americana en 5 palabras. Aceptar la realidad.", examples:[{en:"I didn't get the job. It is what it is.",es:"No conseguí el trabajo. Es lo que es."},{en:"It's not perfect but it is what it is.",es:"No es perfecto, pero así son las cosas."}] },
+  { category:"🙏 Pidiendo ayuda", en:"Could you repeat that?", pron:"KUD yu ri-PIT DAT", es:"¿Podrías repetir eso?", tip:"COULD = podría (más educado que CAN). REPEAT = repetir.", examples:[{en:"Sorry, could you repeat that?",es:"Perdón, ¿podrías repetirlo?"},{en:"Could you repeat that more slowly?",es:"¿Podrías repetirlo más despacio?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"Can you speak more slowly?", pron:"kan yu SPIK mor SLOU-li", es:"¿Puedes hablar más despacio?", tip:"SLOW = lento. Imagina slow-motion. Pídele slow-motion.", examples:[{en:"Can you speak more slowly please?",es:"¿Puedes hablar más despacio?"},{en:"I'm learning English. Can you speak more slowly?",es:"Estoy aprendiendo inglés. ¿Más despacio?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"What does that mean?", pron:"WAT das DAT MIN", es:"¿Qué significa eso?", tip:"MEAN = significar. ¡La más útil al aprender inglés!", examples:[{en:"He said 'quirky'. What does that mean?",es:"Dijo 'quirky'. ¿Qué significa?"},{en:"What does 'indeed' mean?",es:"¿Qué significa 'indeed'?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"Can you help me?", pron:"kan yu JELP mi", es:"¿Puedes ayudarme?", tip:"HELP = ayuda. CAN = puedes. Directa y clara.", examples:[{en:"Excuse me, can you help me?",es:"Disculpe, ¿puede ayudarme?"},{en:"Can you help me find this?",es:"¿Puedes ayudarme a encontrar esto?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"Let me know.", pron:"LET mi NO", es:"Avísame. / Cuéntame.", tip:"LET ME KNOW = hazme saber = avísame. Muy usada en mensajes.", examples:[{en:"Let me know if you need help.",es:"Avísame si necesitas ayuda."},{en:"Let me know when you're ready.",es:"Dime cuando estés listo."}] },
+  { category:"❤️ Emociones", en:"I'm so excited!", pron:"aim so ek-SAI-ted", es:"¡Estoy muy emocionado/a!", tip:"EXCITED = emocionado. Para anticipación positiva.", examples:[{en:"I'm so excited about the trip!",es:"¡Estoy muy emocionado por el viaje!"},{en:"She's really excited about the concert.",es:"Está muy emocionada con el concierto."}] },
+  { category:"❤️ Emociones", en:"I can't wait!", pron:"ai KANT weit", es:"¡No puedo esperar!", tip:"WAIT = esperar. CAN'T WAIT = no puedo esperar más.", examples:[{en:"The concert is tomorrow. I can't wait!",es:"El concierto es mañana. ¡No puedo esperar!"},{en:"I can't wait to see you!",es:"¡No puedo esperar para verte!"}] },
+  { category:"❤️ Emociones", en:"That's amazing!", pron:"dats a-MEI-sing", es:"¡Eso es increíble!", tip:"AMAZING = increíble/asombroso. Para admiración fuerte.", examples:[{en:"You cooked all this? That's amazing!",es:"¿Cocinaste todo esto? ¡Es increíble!"},{en:"The view from here is amazing!",es:"¡La vista desde aquí es increíble!"}] },
+  { category:"❤️ Emociones", en:"I'm exhausted.", pron:"aim eg-ZOS-ted", es:"Estoy agotado/a.", tip:"EXHAUST = agotar. Como el escape del carro. ¡Sin energía!", examples:[{en:"I worked 12 hours. I'm exhausted.",es:"Trabajé 12 horas. Estoy agotado."},{en:"I'm exhausted, I'm going to bed.",es:"Estoy agotado, me voy a dormir."}] },
+  { category:"❤️ Emociones", en:"I'm stressed out.", pron:"aim STREST aut", es:"Estoy muy estresado/a.", tip:"STRESS = estrés (igual). OUT = completamente. Estrés al máximo.", examples:[{en:"I'm so stressed out with work.",es:"Estoy muy estresado con el trabajo."},{en:"Don't worry, I'm just a bit stressed out.",es:"No te preocupes, solo estoy estresado."}] },
+  { category:"❤️ Emociones", en:"I'm so proud of you!", pron:"aim so PRAUD ov yu", es:"¡Estoy muy orgulloso/a de ti!", tip:"PROUD = orgulloso. Imagina un pavo real con pecho inflado.", examples:[{en:"You passed the exam! I'm so proud of you!",es:"¡Pasaste el examen! ¡Estoy muy orgulloso!"},{en:"I'm so proud of everything you've done.",es:"Estoy muy orgulloso de todo lo que has logrado."}] },
+  { category:"💭 Opiniones", en:"I think so.", pron:"ai ZINK so", es:"Creo que sí.", tip:"I THINK = yo pienso. SO = eso. 'Así lo pienso'. Opuesto: I don't think so.", examples:[{en:"Will she come? — I think so.",es:"¿Ella vendrá? — Creo que sí."},{en:"Is it good? — I think so.",es:"¿Está bueno? — Creo que sí."}] },
+  { category:"💭 Opiniones", en:"I totally agree.", pron:"ai TO-ta-li a-GRI", es:"Estoy totalmente de acuerdo.", tip:"TOTALLY = totalmente. AGREE = de acuerdo. Opuesto: I disagree.", examples:[{en:"That movie was great! — I totally agree!",es:"¡Esa película estuvo genial! — ¡Totalmente de acuerdo!"},{en:"I totally agree with what you said.",es:"Completamente de acuerdo."}] },
+  { category:"💭 Opiniones", en:"In my opinion...", pron:"in mai o-PI-nion", es:"En mi opinión...", tip:"OPINION = opinión. ¡Idéntica! Úsala para dar tu punto de vista.", examples:[{en:"In my opinion, that's the best option.",es:"En mi opinión, esa es la mejor opción."},{en:"In my opinion, we should wait.",es:"En mi opinión, deberíamos esperar."}] },
+  { category:"💭 Opiniones", en:"It's not a big deal.", pron:"its not a big DIL", es:"No es gran cosa.", tip:"BIG DEAL = gran asunto. NOT A BIG DEAL = no es para tanto.", examples:[{en:"Sorry I forgot! — It's not a big deal.",es:"Perdón que olvidé. — No es para tanto."},{en:"Don't worry, it's not a big deal.",es:"No te preocupes, no es gran cosa."}] },
+  { category:"💼 Trabajo", en:"Let's get started.", pron:"lets guet STAR-ted", es:"Empecemos.", tip:"GET STARTED = ponerse en marcha. LET'S = vamos.", examples:[{en:"Everyone's here. Let's get started!",es:"Ya están todos. ¡Empecemos!"},{en:"It's 9am. Let's get started.",es:"Son las 9. Comencemos."}] },
+  { category:"💼 Trabajo", en:"I'll take care of it.", pron:"ail teik ker ov it", es:"Yo me encargo de eso.", tip:"TAKE CARE = encargarse. 'Yo tomo el cuidado de eso'.", examples:[{en:"Who'll send the email? — I'll take care of it.",es:"¿Quién envía el correo? — Yo me encargo."},{en:"Don't worry, I'll take care of it.",es:"No te preocupes, yo me encargo."}] },
+  { category:"💼 Trabajo", en:"I'm working on it.", pron:"aim WOR-king on it", es:"Estoy trabajando en eso.", tip:"WORKING ON = trabajar en algo. 'Estoy encima de eso'.", examples:[{en:"Is the report ready? — I'm working on it.",es:"¿Está listo el informe? — Ya lo estoy haciendo."},{en:"I'm working on it, give me an hour.",es:"Estoy en eso, dame una hora."}] },
+  { category:"💼 Trabajo", en:"Keep me posted.", pron:"KIP mi POUS-ted", es:"Mantenme al tanto.", tip:"POSTED = informado. KEEP ME POSTED = mantente informándome.", examples:[{en:"Keep me posted on the situation.",es:"Dame noticias sobre la situación."},{en:"I'm waiting for the results. Keep me posted.",es:"Espero los resultados. Mantenme al tanto."}] },
+  { category:"💼 Trabajo", en:"I'll get back to you.", pron:"ail guet BAK tu yu", es:"Te respondo luego.", tip:"GET BACK = volver. 'Vuelvo hacia ti' = te contacto después.", examples:[{en:"I need to check this. I'll get back to you.",es:"Necesito verificar. Te respondo luego."},{en:"I'll get back to you by tomorrow.",es:"Me comunico contigo mañana."}] },
+  { category:"🍕 Comida", en:"I'm starving!", pron:"aim STAR-ving", es:"¡Estoy muerto de hambre!", tip:"STARVING = muriendo de hambre. Más dramático que 'I'm hungry'.", examples:[{en:"When do we eat? I'm starving!",es:"¿Cuándo comemos? ¡Me muero de hambre!"},{en:"I'm starving, let's order something.",es:"Estoy muerto de hambre, pidamos algo."}] },
+  { category:"🍕 Comida", en:"What do you recommend?", pron:"wat du yu re-ko-MEND", es:"¿Qué recomiendas?", tip:"RECOMMEND = recomendar (casi igual). Perfecta en restaurantes.", examples:[{en:"It's my first time here. What do you recommend?",es:"Es mi primera vez. ¿Qué recomiendas?"},{en:"What do you recommend from the menu?",es:"¿Qué recomiendas del menú?"}] },
+  { category:"🍕 Comida", en:"It's delicious!", pron:"its de-LI-shos", es:"¡Está delicioso!", tip:"DELICIOUS = delicioso (casi igual). Con 'sh' al final.", examples:[{en:"This is amazing! It's delicious!",es:"¡Esto está increíble! ¡Delicioso!"},{en:"Your mom's cooking is delicious.",es:"La cocina de tu mamá está deliciosa."}] },
+  { category:"🍕 Comida", en:"Can we get the check, please?", pron:"kan wi guet da CHEK PLIS", es:"¿Nos trae la cuenta, por favor?", tip:"CHECK = cuenta (EEUU). THE CHECK = la cuenta.", examples:[{en:"Can we get the check, please?",es:"¿Nos trae la cuenta?"},{en:"Excuse me, can we get the check?",es:"Disculpe, ¿nos puede traer la cuenta?"}] },
+  { category:"🍕 Comida", en:"Let's split the bill.", pron:"lets SPLIT da BIL", es:"Dividamos la cuenta. / A medias.", tip:"SPLIT = dividir. BILL = cuenta. SPLIT THE BILL = a medias.", examples:[{en:"Should we split the bill?",es:"¿Dividimos la cuenta?"},{en:"Let's split the bill this time.",es:"Esta vez a medias."}] },
+  { category:"✈️ Viajes", en:"I'm lost.", pron:"aim LOST", es:"Estoy perdido/a.", tip:"LOST = perdido. ¡Como la serie 'LOST'!", examples:[{en:"I'm lost. Can you help me?",es:"Estoy perdido. ¿Puede ayudarme?"},{en:"I think I'm lost. Is this Main Street?",es:"Creo que estoy perdido. ¿Es esta la calle principal?"}] },
+  { category:"✈️ Viajes", en:"How long does it take?", pron:"JAU LONG das it TEIK", es:"¿Cuánto tiempo tarda?", tip:"HOW LONG = cuánto tiempo. TAKE = tomar/tardar.", examples:[{en:"How long does it take to get there?",es:"¿Cuánto se tarda en llegar?"},{en:"How long does the flight take?",es:"¿Cuánto dura el vuelo?"}] },
+  { category:"✈️ Viajes", en:"Is breakfast included?", pron:"is BREK-fast in-KLUD-ed", es:"¿El desayuno está incluido?", tip:"BREAKFAST = desayuno. INCLUDED = incluido (casi igual).", examples:[{en:"Is breakfast included in the price?",es:"¿El desayuno está incluido?"},{en:"Is Wi-Fi included?",es:"¿El Wi-Fi está incluido?"}] },
+  { category:"🛍️ Compras", en:"How much is this?", pron:"JAU MACH is DIS", es:"¿Cuánto cuesta esto?", tip:"HOW MUCH = cuánto. THIS = esto. La más básica para comprar.", examples:[{en:"Excuse me, how much is this?",es:"Disculpe, ¿cuánto cuesta esto?"},{en:"How much is this shirt?",es:"¿Cuánto cuesta esta camisa?"}] },
+  { category:"🛍️ Compras", en:"I'm just looking.", pron:"aim jast LUK-ing", es:"Solo estoy mirando.", tip:"JUST = solo. LOOKING = mirando. Cuando el vendedor se acerca.", examples:[{en:"Can I help you? — I'm just looking, thanks.",es:"¿Le ayudo? — Solo estoy mirando."},{en:"I'm just looking around.",es:"Solo estoy dando una vuelta."}] },
+  { category:"🛍️ Compras", en:"Can I get a discount?", pron:"kan ai guet a DIS-kaunt", es:"¿Me puede dar un descuento?", tip:"DISCOUNT = descuento (casi igual). ¡Siempre vale preguntar!", examples:[{en:"Is this the final price? Can I get a discount?",es:"¿Es el precio final? ¿Me da un descuento?"},{en:"Can I get a discount if I buy two?",es:"¿Me dan descuento si compro dos?"}] },
+  { category:"🚀 Situaciones", en:"I'm on my way.", pron:"aim on mai WEI", es:"Ya voy. / Estoy en camino.", tip:"ON MY WAY = en mi camino. Imagina que estás encima de tu camino.", examples:[{en:"Where are you? — I'm on my way!",es:"¿Dónde estás? — ¡Ya voy!"},{en:"Don't start without me, I'm on my way.",es:"No empiecen sin mí, estoy en camino."}] },
+  { category:"🚀 Situaciones", en:"Never mind.", pron:"NE-ver maind", es:"No importa. / Olvídalo.", tip:"MIND = mente. NEVER MIND = nunca pongas tu mente en eso.", examples:[{en:"Never mind, I found it!",es:"¡Olvídalo, lo encontré!"},{en:"Never mind, it's not important.",es:"No importa, no es importante."}] },
+  { category:"🚀 Situaciones", en:"It's worth it.", pron:"its WERZ it", es:"Vale la pena.", tip:"WORTH = valer. WORTH IT = que vale el esfuerzo.", examples:[{en:"The hotel is expensive but it's worth it.",es:"El hotel es caro pero vale la pena."},{en:"Is the course worth it? — Totally!",es:"¿Vale la pena el curso? — ¡Totalmente!"}] },
+  { category:"🚀 Situaciones", en:"Don't worry about it.", pron:"DONT WO-ri a-BAUT it", es:"No te preocupes por eso.", tip:"WORRY = preocuparse. DON'T WORRY = no te preocupes.", examples:[{en:"I broke a glass. — Don't worry about it!",es:"Rompí un vaso. — ¡No te preocupes!"},{en:"Don't worry about it, we'll fix it.",es:"No te preocupes, lo arreglamos."}] },
+  { category:"🚀 Situaciones", en:"I've got this.", pron:"aiv GOT dis", es:"Yo puedo con esto. / Lo tengo.", tip:"GOT THIS = lo tengo bajo control. Para demostrar confianza.", examples:[{en:"Do you need help? — No, I've got this.",es:"¿Necesitas ayuda? — No, lo tengo."},{en:"Don't worry, I've got this.",es:"No te preocupes, yo puedo con esto."}] },
+  { category:"🚀 Situaciones", en:"Hold on!", pron:"JOLD ON", es:"¡Espera! / ¡Un momento!", tip:"HOLD = sostener. HOLD ON = aguanta = espera.", examples:[{en:"Hold on, let me check.",es:"Espera, déjame verificar."},{en:"Hold on! I forgot something.",es:"¡Espera! Olvidé algo."}] },
+  { category:"🎉 Social", en:"Are you free tonight?", pron:"ar yu FRI tu-NAIT", es:"¿Estás libre esta noche?", tip:"FREE = libre (disponible). TONIGHT = esta noche.", examples:[{en:"Are you free tonight? Let's grab dinner.",es:"¿Estás libre esta noche? Salgamos a cenar."},{en:"Are you free this weekend?",es:"¿Estás libre este fin de semana?"}] },
+  { category:"🎉 Social", en:"Want to hang out?", pron:"WONT tu JANG aut", es:"¿Quieres que pasemos el rato?", tip:"HANG OUT = pasar el tiempo sin plan específico. Muy usada.", examples:[{en:"I'm bored. Want to hang out?",es:"Estoy aburrido. ¿Salimos?"},{en:"We should hang out more often.",es:"Deberíamos pasar más tiempo juntos."}] },
+  { category:"🎉 Social", en:"Count me in!", pron:"KAUNT mi IN", es:"¡Cuenten conmigo! / ¡Me apunto!", tip:"COUNT ME IN = cuéntame dentro = incluido. Opuesto: 'Count me out'.", examples:[{en:"We're going hiking. — Count me in!",es:"Vamos de caminata. — ¡Cuenten conmigo!"},{en:"Road trip? Count me in!",es:"¿Viaje? ¡Me apunto!"}] },
+  { category:"🎉 Social", en:"I can't make it.", pron:"ai KANT MEIK it", es:"No puedo ir.", tip:"MAKE IT = llegar/asistir. CAN'T MAKE IT = no puedo ir.", examples:[{en:"Sorry, I can't make it to the party.",es:"Lo siento, no puedo ir a la fiesta."},{en:"I can't make it tonight, I'm sick.",es:"No puedo esta noche, estoy enfermo."}] },
+  { category:"🎉 Social", en:"It's on me!", pron:"its on MI", es:"¡Yo invito! / ¡Corre por mi cuenta!", tip:"ON ME = encima de mí = es mi responsabilidad pagar.", examples:[{en:"Put your wallet away, it's on me!",es:"Guarda tu cartera, ¡yo invito!"},{en:"This round is on me!",es:"¡Esta ronda corre por mi cuenta!"}] },
+  { category:"🎉 Social", en:"What are you up to?", pron:"WAT ar yu AP tu", es:"¿Qué estás haciendo? / ¿En qué andas?", tip:"UP TO = haciendo. ¿Qué estás 'metido'?", examples:[{en:"Hey! What are you up to tonight?",es:"¡Oye! ¿Qué haces esta noche?"},{en:"What are you up to this weekend?",es:"¿Qué planes tienes este fin de semana?"}] },
+  { category:"💪 Motivación", en:"You can do it!", pron:"yu KAN du it", es:"¡Tú puedes hacerlo!", tip:"CAN = poder. DO IT = hacerlo. La frase de motivación más básica.", examples:[{en:"I'm nervous. — You can do it!",es:"Estoy nervioso. — ¡Tú puedes!"},{en:"Don't give up! You can do it!",es:"¡No te rindas! ¡Tú puedes!"}] },
+  { category:"💪 Motivación", en:"Don't give up!", pron:"DONT GIV AP", es:"¡No te rindas!", tip:"GIVE UP = rendirse. DON'T GIVE UP = no te rindas.", examples:[{en:"I want to quit. — Don't give up!",es:"Quiero dejarlo. — ¡No te rindas!"},{en:"Don't give up, you're almost there!",es:"¡No te rindas, ya casi llegas!"}] },
+  { category:"💪 Motivación", en:"You've got this!", pron:"yuv GOT dis", es:"¡Tú puedes! / ¡Lo tienes!", tip:"GOT THIS = tienes esto bajo control. ¡Ya tienes lo necesario!", examples:[{en:"Big interview today? You've got this!",es:"¿Gran entrevista hoy? ¡Tú puedes!"},{en:"Don't worry, you've got this!",es:"No te preocupes, ¡lo tienes!"}] },
+  { category:"🙌 Gratitud", en:"Thanks a lot!", pron:"ZANKS a LOT", es:"¡Muchas gracias!", tip:"THANKS = gracias. A LOT = mucho. Muchísimas gracias.", examples:[{en:"You saved me! Thanks a lot!",es:"¡Me salvaste! ¡Muchas gracias!"},{en:"Thanks a lot for your help.",es:"Muchas gracias por tu ayuda."}] },
+  { category:"🙌 Gratitud", en:"I really appreciate it.", pron:"ai RI-li a-PRI-shi-eit it", es:"Lo aprecio mucho.", tip:"APPRECIATE = apreciar (casi igual). Para agradecer algo significativo.", examples:[{en:"You stayed late to help me. I really appreciate it.",es:"Te quedaste tarde. Te lo aprecio mucho."},{en:"I really appreciate your support.",es:"Aprecio mucho tu apoyo."}] },
+  { category:"🙌 Gratitud", en:"I owe you one.", pron:"ai O yu WAN", es:"Te debo una.", tip:"OWE = deber. YOU ONE = a ti uno. 'Te debo un favor'.", examples:[{en:"You covered for me. I owe you one!",es:"Me cubriste. ¡Te debo una!"},{en:"I owe you one for this.",es:"Te quedo debiendo por esto."}] },
+  { category:"🙌 Gratitud", en:"I'm so sorry.", pron:"aim so SO-ri", es:"Lo siento mucho.", tip:"SORRY = lo siento. SO = tanto. I'M SO SORRY = lo siento tantísimo.", examples:[{en:"I forgot your birthday. I'm so sorry.",es:"Olvidé tu cumpleaños. Lo siento mucho."},{en:"I'm so sorry for what happened.",es:"Lo siento mucho por lo que pasó."}] },
+  { category:"🔥 Expresiones", en:"Better late than never.", pron:"BE-ter LEIT dan NE-ver", es:"Mejor tarde que nunca.", tip:"LATE = tarde. NEVER = nunca. ¡Idéntico al español!", examples:[{en:"Finally done! — Better late than never!",es:"¡Por fin listo! — ¡Mejor tarde que nunca!"},{en:"Better late than never.",es:"Mejor tarde que nunca."}] },
+  { category:"🔥 Expresiones", en:"That's a piece of cake.", pron:"dats a PIS ov KEIK", es:"Eso está tirado. / Es facilísimo.", tip:"PIECE OF CAKE = pedazo de pastel. Tan fácil como comer pastel.", examples:[{en:"Was the exam hard? — Piece of cake!",es:"¿Estuvo difícil el examen? — ¡Estaba tirado!"},{en:"Don't worry, this is a piece of cake.",es:"No te preocupes, esto es facilísimo."}] },
+  { category:"🔥 Expresiones", en:"Break a leg!", pron:"BREIK a LEG", es:"¡Buena suerte! (para presentaciones)", tip:"Literalmente 'rómpete una pierna'. ¡Lo contrario de lo que dice!", examples:[{en:"I have a big presentation. — Break a leg!",es:"Tengo una gran presentación. — ¡Mucha suerte!"},{en:"Break a leg at your audition!",es:"¡Mucho éxito en tu audición!"}] },
+  { category:"🔥 Expresiones", en:"Speak of the devil!", pron:"SPIK ov da DE-vol", es:"¡Hablando del rey de Roma!", tip:"¡Igual al español! Cuando aparece la persona de quien hablabas.", examples:[{en:"I was just talking about you! Speak of the devil!",es:"¡Justo estaba hablando de ti! ¡Hablando del diablo!"},{en:"Speak of the devil, here he comes!",es:"¡Hablando del rey de Roma! ¡Ahí viene!"}] },
+  { category:"🔥 Expresiones", en:"Hang in there!", pron:"JANG in DER", es:"¡Aguanta! / ¡No te rindas!", tip:"HANG = aguantar. '¡Aguanta ahí!' Para momentos difíciles.", examples:[{en:"Work is hard. Hang in there!",es:"El trabajo está difícil. ¡Aguanta!"},{en:"Hang in there, it'll get better!",es:"¡No te rindas, va a mejorar!"}] },
+  { category:"⏰ Tiempo", en:"I'm running late.", pron:"aim RUN-ing LEIT", es:"Voy tarde.", tip:"RUNNING LATE = corriendo tarde. Imagina que corres pero llegas tarde.", examples:[{en:"I'm running late, start without me.",es:"Voy tarde, empiecen sin mí."},{en:"Sorry, I'm running late. Be there in 10.",es:"Perdón, voy tarde. Llego en 10."}] },
+  { category:"⏰ Tiempo", en:"Time flies!", pron:"TAIM FLAIZ", es:"¡El tiempo vuela!", tip:"TIME = tiempo. FLIES = vuela. ¡Igual que en español!", examples:[{en:"We've known each other for 10 years. Time flies!",es:"Nos conocemos hace 10 años. ¡El tiempo vuela!"},{en:"Time flies when you're having fun.",es:"El tiempo vuela cuando la pasas bien."}] },
+  { category:"✅ Acuerdo", en:"Absolutely!", pron:"AB-so-lut-li", es:"¡Absolutamente! / ¡Por supuesto!", tip:"ABSOLUTE = absoluto (igual). Para un sí muy enfático.", examples:[{en:"Are you sure? — Absolutely!",es:"¿Estás seguro? — ¡Absolutamente!"},{en:"Do you want to go? — Absolutely!",es:"¿Quieres ir? — ¡Claro que sí!"}] },
+  { category:"✅ Acuerdo", en:"That works for me.", pron:"DAT WERKS for mi", es:"Eso me funciona. / Me parece bien.", tip:"WORKS = funciona. THAT WORKS = eso funciona = me parece bien.", examples:[{en:"How about 3pm? — That works for me!",es:"¿Qué tal las 3pm? — ¡Me funciona!"},{en:"That works for me, see you then.",es:"Eso me funciona, nos vemos."}] },
+  { category:"✅ Acuerdo", en:"Deal!", pron:"DIL", es:"¡Trato! / ¡De acuerdo!", tip:"DEAL = trato. IT'S A DEAL = es un trato. Para confirmar acuerdos.", examples:[{en:"I'll cook if you clean. — Deal!",es:"Yo cocino si tú limpias. — ¡Trato!"},{en:"Meet you at 7? — Deal!",es:"¿Nos vemos a las 7? — ¡De acuerdo!"}] },
+  { category:"😲 Reacciones", en:"No way!", pron:"no WEI", es:"¡No puede ser! / ¡Imposible!", tip:"NO WAY = no hay manera. ¡No existe manera de que eso sea verdad!", examples:[{en:"She got promoted! — No way!",es:"¡La ascendieron! — ¡No puede ser!"},{en:"No way I'm doing that!",es:"¡De ninguna manera hago eso!"}] },
+  { category:"😲 Reacciones", en:"I can't believe it!", pron:"ai KANT bi-LIV it", es:"¡No lo puedo creer!", tip:"BELIEVE = creer. CAN'T BELIEVE IT = no puedo creerlo.", examples:[{en:"You won the lottery?! I can't believe it!",es:"¿Ganaste la lotería?! ¡No lo puedo creer!"},{en:"I can't believe how fast time flies.",es:"No puedo creer lo rápido que pasa el tiempo."}] },
+  { category:"😲 Reacciones", en:"That blew my mind!", pron:"dat BLU mai MAIND", es:"¡Me voló la cabeza!", tip:"BLOW MIND = volar la mente. Sorpresa tan grande que quedas sin palabras.", examples:[{en:"That documentary blew my mind!",es:"¡Ese documental me voló la cabeza!"},{en:"The magic trick totally blew my mind.",es:"El truco de magia me dejó sin palabras."}] },
+  { category:"👨‍👩‍👧 Familia", en:"I miss you.", pron:"ai MIS yu", es:"Te extraño.", tip:"MISS = extrañar. 'Te extraño' = I miss you.", examples:[{en:"It's been months. I miss you so much.",es:"Han pasado meses. Te extraño mucho."},{en:"Come visit soon, we all miss you!",es:"Visítanos pronto, ¡todos te extrañamos!"}] },
+  { category:"👨‍👩‍👧 Familia", en:"I love you.", pron:"ai LAV yu", es:"Te quiero. / Te amo.", tip:"LOVE = amor. En inglés no hay diferencia entre 'te quiero' y 'te amo'.", examples:[{en:"Good night, mom. I love you.",es:"Buenas noches, mamá. Te quiero."},{en:"I love you more than words can say.",es:"Te amo más de lo que las palabras pueden decir."}] },
+  { category:"💰 Dinero", en:"I'm broke.", pron:"aim BROUK", es:"Estoy pelado/a. / No tengo dinero.", tip:"BROKE = roto/sin dinero. Muy coloquial.", examples:[{en:"I can't go out tonight, I'm broke.",es:"No puedo salir esta noche, estoy pelado."},{en:"I'm broke until payday.",es:"Estoy sin dinero hasta el día de pago."}] },
+  { category:"💰 Dinero", en:"I can't afford it.", pron:"ai KANT a-FORD it", es:"No me lo puedo permitir.", tip:"AFFORD = poder permitirse algo económicamente.", examples:[{en:"I love it, but I can't afford it.",es:"Me encanta, pero no me alcanza."},{en:"We can't afford a vacation this year.",es:"No podemos permitirnos vacaciones este año."}] },
+  { category:"🧘 Bienestar", en:"I need a break.", pron:"ai NID a BREIK", es:"Necesito un descanso.", tip:"BREAK = descanso. NEED A BREAK = necesitar pausa.", examples:[{en:"I've been working for 5 hours. I need a break.",es:"Llevo 5 horas trabajando. Necesito un descanso."},{en:"Can we take a break?",es:"¿Podemos tomar un descanso?"}] },
+  { category:"🧘 Bienestar", en:"Take it easy.", pron:"TEIK it I-si", es:"Cálmate. / Relájate.", tip:"TAKE IT EASY = tómalo fácil = relájate.", examples:[{en:"You look stressed. Take it easy!",es:"Se te ve estresado. ¡Relájate!"},{en:"It's the weekend! Take it easy.",es:"¡Es fin de semana! Tómatelo con calma."}] },
+  { category:"🧘 Bienestar", en:"Let it go.", pron:"LET it GO", es:"Suéltalo. / Déjalo ir.", tip:"LET GO = soltar. Para cuando te aferras a algo que debes dejar atrás.", examples:[{en:"You can't control everything. Let it go.",es:"No puedes controlarlo todo. Suéltalo."},{en:"He's not worth it. Let it go.",es:"No vale la pena. Olvídalo."}] },
+  { category:"🎬 Entretenimiento", en:"Have you seen...?", pron:"JAV yu SIN", es:"¿Has visto...?", tip:"HAVE YOU SEEN = ¿has visto? Para recomendar películas/series.", examples:[{en:"Have you seen that new Netflix show?",es:"¿Has visto esa nueva serie de Netflix?"},{en:"Have you seen Oppenheimer?",es:"¿Has visto Oppenheimer?"}] },
+  { category:"🎬 Entretenimiento", en:"I'm hooked!", pron:"aim JUKT", es:"¡Estoy enganchado!", tip:"HOOKED = enganchado (como un anzuelo). Estás atrapado por la serie.", examples:[{en:"I started watching and now I'm hooked!",es:"Empecé a verlo y ¡ahora estoy enganchado!"},{en:"That series has me hooked.",es:"Esa serie me tiene adicto."}] },
+  { category:"🎬 Entretenimiento", en:"No spoilers, please!", pron:"no SPOI-lers PLIS", es:"¡Sin spoilers, por favor!", tip:"SPOILER = algo que arruina la sorpresa. ¡Universal!", examples:[{en:"I haven't seen it yet. No spoilers!",es:"Todavía no lo he visto. ¡Sin spoilers!"},{en:"No spoilers! I'm only on episode 3.",es:"¡Sin spoilers! Solo voy en el episodio 3."}] },
+
+  // ===== MÁS SALUDOS =====
+  { category:"👋 Saludos", en:"How have you been?", pron:"JAU jav yu BIN", es:"¿Cómo has estado?", tip:"BEEN = estado. Úsala cuando ves a alguien después de tiempo.", examples:[{en:"Long time no see! How have you been?",es:"¡Cuánto tiempo! ¿Cómo has estado?"},{en:"I've been great, thanks!",es:"He estado muy bien, ¡gracias!"}] },
+  { category:"👋 Saludos", en:"Long time no see!", pron:"LONG taim no SI", es:"¡Cuánto tiempo sin verte!", tip:"LONG TIME = mucho tiempo. NO SEE = sin ver. ¡Literalmente lo mismo que en español!", examples:[{en:"Long time no see! How are you?",es:"¡Cuánto tiempo! ¿Cómo estás?"},{en:"Hey! Long time no see!",es:"¡Oye! ¡Cuánto tiempo!"}] },
+  { category:"👋 Saludos", en:"Catch you later!", pron:"KACH yu LEI-ter", es:"¡Nos vemos después! (muy informal)", tip:"CATCH = atrapar. 'Te atrapo después' = nos vemos.", examples:[{en:"Gotta run. Catch you later!",es:"Tengo que correr. ¡Nos vemos!"},{en:"Catch you later at the party!",es:"¡Nos vemos en la fiesta!"}] },
+
+  // ===== MÁS CONVERSACIÓN =====
+  { category:"💬 Conversación", en:"I'm just saying.", pron:"aim jast SEI-ing", es:"Solo digo. / Es solo mi opinión.", tip:"JUST SAYING = solo diciendo. Úsala para suavizar una crítica.", examples:[{en:"It's a bit expensive, I'm just saying.",es:"Es un poco caro, solo digo."},{en:"I'm not criticizing, I'm just saying.",es:"No estoy criticando, es solo lo que pienso."}] },
+  { category:"💬 Conversación", en:"Trust me.", pron:"TRAST mi", es:"Confía en mí. / Créeme.", tip:"TRUST = confianza. TRUST ME = confía en mí.", examples:[{en:"This restaurant is amazing, trust me!",es:"Este restaurante está increíble, ¡confía en mí!"},{en:"Trust me, you'll love it.",es:"Créeme, te va a encantar."}] },
+  { category:"💬 Conversación", en:"That's crazy!", pron:"dats KREI-si", es:"¡Eso está loco! / ¡Qué locura!", tip:"CRAZY = loco. Para reaccionar a algo sorprendente.", examples:[{en:"She won a million dollars! That's crazy!",es:"¡Ganó un millón! ¡Qué locura!"},{en:"That's crazy, I was just thinking about you!",es:"¡Qué loco, justo pensaba en ti!"}] },
+  { category:"💬 Conversación", en:"What's going on?", pron:"WATS GOH-ing on", es:"¿Qué pasa? / ¿Qué está pasando?", tip:"GOING ON = pasando. Úsala cuando algo raro sucede.", examples:[{en:"Everyone's staring. What's going on?",es:"Todos están mirando. ¿Qué pasa?"},{en:"What's going on? You look upset.",es:"¿Qué pasa? Se te ve molesto."}] },
+  { category:"💬 Conversación", en:"Tell me about it!", pron:"TEL mi a-BAUT it", es:"¡Me lo dices a mí! / ¡Ya lo sé!", tip:"Es sarcástico: significa que TÚ también sabes lo difícil que es.", examples:[{en:"Traffic was terrible. — Tell me about it!",es:"El tráfico estuvo horrible. — ¡Me lo dices a mí!"},{en:"Work is so stressful. — Tell me about it!",es:"El trabajo es muy estresante. — ¡Ya lo sé!"}] },
+  { category:"💬 Conversación", en:"I could use some...", pron:"ai KUD yus SOM", es:"Me vendría bien...", tip:"COULD USE = podría usar = necesitaría. I COULD USE A COFFEE = me vendría bien un café.", examples:[{en:"I could use some help here.",es:"Me vendría bien un poco de ayuda."},{en:"I could use a vacation right now.",es:"Me vendría bien unas vacaciones ahora."}] },
+  { category:"💬 Conversación", en:"What's the catch?", pron:"WATS da KACH", es:"¿Cuál es el truco? / ¿Cuál es la trampa?", tip:"CATCH = trampa. Algo demasiado bueno siempre tiene una CATCH.", examples:[{en:"Free tickets? What's the catch?",es:"¿Boletos gratis? ¿Cuál es la trampa?"},{en:"It sounds perfect. What's the catch?",es:"Suena perfecto. ¿Cuál es el truco?"}] },
+  { category:"💬 Conversación", en:"As far as I know.", pron:"as FAR as ai NO", es:"Hasta donde sé. / Que yo sepa.", tip:"FAR = lejos. AS FAR AS I KNOW = hasta donde llega mi conocimiento.", examples:[{en:"Is the store open? — As far as I know, yes.",es:"¿Está abierta? — Que yo sepa, sí."},{en:"As far as I know, nothing has changed.",es:"Hasta donde sé, nada ha cambiado."}] },
+  { category:"💬 Conversación", en:"I'll be right back.", pron:"ail bi RAIT BAK", es:"Ahorita vuelvo. / Regreso ya.", tip:"RIGHT BACK = de vuelta de inmediato. RIGHT = ahora mismo.", examples:[{en:"I'll be right back, I need to use the bathroom.",es:"Ahorita vuelvo, necesito ir al baño."},{en:"Don't go anywhere, I'll be right back.",es:"No se vayan, regreso ya."}] },
+  { category:"💬 Conversación", en:"Let's figure it out.", pron:"lets FI-gyer it AUT", es:"Vamos a resolverlo.", tip:"FIGURE OUT = descifrar/resolver. LET'S = vamos.", examples:[{en:"I don't know how. Let's figure it out together.",es:"No sé cómo. Vamos a resolverlo juntos."},{en:"Let's figure it out as we go.",es:"Vamos resolviéndolo sobre la marcha."}] },
+  { category:"💬 Conversación", en:"You're welcome!", pron:"yor WEL-kom", es:"¡De nada! / ¡Con mucho gusto!", tip:"YOU'RE WELCOME = eres bienvenido a ese favor = de nada.", examples:[{en:"Thanks for the help! — You're welcome!",es:"¡Gracias por la ayuda! — ¡De nada!"},{en:"You're very welcome, anytime!",es:"¡Con mucho gusto, cuando quieras!"}] },
+  { category:"💬 Conversación", en:"Of course!", pron:"ov KORS", es:"¡Claro! / ¡Por supuesto!", tip:"COURSE = camino. OF COURSE = del camino natural = claro, obvio.", examples:[{en:"Can you help me? — Of course!",es:"¿Puedes ayudarme? — ¡Claro!"},{en:"Of course, it's not a problem.",es:"Por supuesto, no es ningún problema."}] },
+  { category:"💬 Conversación", en:"Go ahead.", pron:"GO a-JED", es:"Adelante. / Procede.", tip:"GO = ir. AHEAD = adelante. Para ceder el paso o dar permiso.", examples:[{en:"Can I ask you something? — Go ahead.",es:"¿Puedo preguntarte algo? — Adelante."},{en:"Please, go ahead.",es:"Por favor, adelante."}] },
+  { category:"💬 Conversación", en:"Not at all.", pron:"NOT at OL", es:"Para nada. / En absoluto.", tip:"AT ALL = en absoluto. NOT AT ALL = para nada.", examples:[{en:"Was it a bother? — Not at all!",es:"¿Fue una molestia? — ¡Para nada!"},{en:"Not at all, it was my pleasure.",es:"Para nada, fue un placer."}] },
+  { category:"💬 Conversación", en:"I'm on it.", pron:"aim ON it", es:"Ya estoy en eso.", tip:"ON IT = encima de eso = ya me estoy ocupando.", examples:[{en:"Can you fix this? — I'm on it!",es:"¿Puedes arreglar esto? — ¡Ya estoy en eso!"},{en:"The boss wants the report. — I'm on it.",es:"El jefe quiere el informe. — Ya estoy en eso."}] },
+  { category:"💬 Conversación", en:"Where are you from?", pron:"WER ar yu FROM", es:"¿De dónde eres?", tip:"WHERE = dónde. FROM = de. Básica al conocer personas.", examples:[{en:"Nice accent. Where are you from?",es:"Bonito acento. ¿De dónde eres?"},{en:"I'm from Spain. Where are you from?",es:"Soy de España. ¿De dónde eres tú?"}] },
+  { category:"💬 Conversación", en:"Excuse me.", pron:"ek-SKYUS mi", es:"Disculpe. / Con permiso.", tip:"EXCUSE = excusar. Para llamar atención o pedir paso.", examples:[{en:"Excuse me, do you know where the station is?",es:"Disculpe, ¿sabe dónde está la estación?"},{en:"Excuse me, can I get through?",es:"Con permiso, ¿puedo pasar?"}] },
+  { category:"💬 Conversación", en:"I'm sorry.", pron:"aim SO-ri", es:"Lo siento. / Perdón.", tip:"SORRY = lo siento/perdón. Para disculparse o expresar condolencia.", examples:[{en:"I'm sorry I'm late.",es:"Lo siento, llegué tarde."},{en:"I heard about your loss. I'm so sorry.",es:"Me enteré de tu pérdida. Lo siento mucho."}] },
+  { category:"💬 Conversación", en:"At the end of the day...", pron:"at da END ov da DEI", es:"Al final del día... / A fin de cuentas...", tip:"Para expresar lo más importante al terminar los argumentos.", examples:[{en:"At the end of the day, it's your decision.",es:"Al final del día, es tu decisión."},{en:"At the end of the day, what matters is happiness.",es:"A fin de cuentas, lo que importa es ser feliz."}] },
+  { category:"💬 Conversación", en:"By the way...", pron:"bai da WEI", es:"Por cierto... / A propósito...", tip:"BY THE WAY = a propósito. Para agregar info o cambiar de tema.", examples:[{en:"By the way, did you hear about the party?",es:"Por cierto, ¿escuchaste lo de la fiesta?"},{en:"Oh, by the way, I forgot to tell you.",es:"Ah, a propósito, olvidé contarte."}] },
+
+  // ===== MÁS AYUDA =====
+  { category:"🙏 Pidiendo ayuda", en:"How do I get to...?", pron:"JAU du ai GET tu", es:"¿Cómo llego a...?", tip:"GET TO = llegar a. Esencial para pedir indicaciones.", examples:[{en:"How do I get to the station?",es:"¿Cómo llego a la estación?"},{en:"How do I get to downtown from here?",es:"¿Cómo llego al centro desde aquí?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"Is it far from here?", pron:"IS it FAR from JIR", es:"¿Está lejos de aquí?", tip:"FAR = lejos. HERE = aquí. Perfecta al preguntar indicaciones.", examples:[{en:"Is the mall far from here?",es:"¿Está lejos el centro comercial?"},{en:"It's not far from here, just 5 minutes.",es:"No está lejos, solo 5 minutos."}] },
+  { category:"🙏 Pidiendo ayuda", en:"Could you do me a favor?", pron:"KUD yu du mi a FEI-vor", es:"¿Me podrías hacer un favor?", tip:"FAVOR existe en español. COULD YOU = ¿podrías? (educado).", examples:[{en:"Hey, could you do me a favor?",es:"Oye, ¿me podrías hacer un favor?"},{en:"Could you do me a favor and call me later?",es:"¿Me harías el favor de llamarme luego?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"Can you give me a hand?", pron:"kan yu GIV mi a JAND", es:"¿Me puedes dar una mano?", tip:"GIVE ME A HAND = dar una mano = ayudar. ¡Igual que en español!", examples:[{en:"Could you give me a hand with these boxes?",es:"¿Me das una mano con estas cajas?"},{en:"Can anyone give me a hand here?",es:"¿Alguien puede ayudarme aquí?"}] },
+  { category:"🙏 Pidiendo ayuda", en:"Can you explain that again?", pron:"kan yu eks-PLEIN dat a-GUEN", es:"¿Puedes explicar eso de nuevo?", tip:"EXPLAIN = explicar (casi igual). AGAIN = de nuevo.", examples:[{en:"Sorry, can you explain that again?",es:"Perdón, ¿puedes explicar eso de nuevo?"},{en:"Can you explain the homework again?",es:"¿Puedes explicar la tarea de nuevo?"}] },
+
+  // ===== MÁS EMOCIONES =====
+  { category:"❤️ Emociones", en:"That's hilarious!", pron:"dats ji-LE-rios", es:"¡Eso es graciosísimo!", tip:"HILARIOUS = hilarante (existe en español). ¡Como un señor llamado Hilario que siempre es gracioso!", examples:[{en:"Did you see that video? It's hilarious!",es:"¿Viste ese video? ¡Es graciosísimo!"},{en:"That joke was hilarious!",es:"¡Ese chiste estuvo genial!"}] },
+  { category:"❤️ Emociones", en:"I'm overwhelmed.", pron:"aim o-ver-WELMD", es:"Estoy abrumado/a.", tip:"OVERWHELMED = cuando tienes DEMASIADO encima. Cubierto de cosas.", examples:[{en:"I have too much work. I'm overwhelmed.",es:"Tengo demasiado trabajo. Estoy abrumado."},{en:"Don't be overwhelmed, we'll do it step by step.",es:"No te abrumes, lo haremos paso a paso."}] },
+  { category:"❤️ Emociones", en:"I'm bored.", pron:"aim BORD", es:"Estoy aburrido/a.", tip:"BORED = aburrido. BORING = aburridor. La película fue BORING, por eso estoy BORED.", examples:[{en:"There's nothing to do. I'm bored.",es:"No hay nada que hacer. Estoy aburrido."},{en:"I'm bored, let's do something!",es:"Estoy aburrido, ¡hagamos algo!"}] },
+  { category:"❤️ Emociones", en:"I'm in a good mood.", pron:"aim in a gud MUD", es:"Estoy de buen humor.", tip:"MOOD = humor/estado de ánimo. GOOD MOOD = buen humor.", examples:[{en:"I got great news. I'm in a good mood!",es:"Recibí buenas noticias. ¡Estoy de buen humor!"},{en:"She's in a good mood today.",es:"Ella está de buen humor hoy."}] },
+  { category:"❤️ Emociones", en:"I'm not in the mood.", pron:"aim not in da MUD", es:"No tengo ganas. / No estoy de humor.", tip:"NOT IN THE MOOD = no estar en el humor para algo.", examples:[{en:"Want to go out? — I'm not in the mood.",es:"¿Salimos? — No tengo ganas."},{en:"I'm not in the mood to talk right now.",es:"No estoy de humor para hablar ahora."}] },
+  { category:"❤️ Emociones", en:"I can't believe it!", pron:"ai KANT bi-LIV it", es:"¡No lo puedo creer!", tip:"BELIEVE = creer. CAN'T BELIEVE IT = no puedo creerlo.", examples:[{en:"You won the lottery?! I can't believe it!",es:"¿Ganaste la lotería?! ¡No lo puedo creer!"},{en:"I can't believe how fast time flies.",es:"No puedo creer lo rápido que pasa el tiempo."}] },
+
+  // ===== MÁS TRABAJO =====
+  { category:"💼 Trabajo", en:"Can we reschedule?", pron:"kan wi ri-SKE-yul", es:"¿Podemos reagendar?", tip:"RE = volver a. SCHEDULE = agenda. RESCHEDULE = re-agendar.", examples:[{en:"I can't make it tomorrow. Can we reschedule?",es:"No puedo mañana. ¿Podemos reagendar?"},{en:"Can we reschedule for Friday?",es:"¿Podemos moverlo al viernes?"}] },
+  { category:"💼 Trabajo", en:"What's the deadline?", pron:"WATS da DED-lain", es:"¿Cuál es la fecha límite?", tip:"DEAD = muerto. LINE = línea. La línea de la muerte = fecha límite.", examples:[{en:"What's the deadline for this project?",es:"¿Cuál es la fecha límite del proyecto?"},{en:"The deadline is next Friday.",es:"La fecha límite es el próximo viernes."}] },
+  { category:"💼 Trabajo", en:"I'm swamped.", pron:"aim SWOMPT", es:"Estoy ocupadísimo. / Estoy hasta el cuello.", tip:"SWAMPED = como un pantano que te cubre. Sumergido en trabajo.", examples:[{en:"Can you help? — I'm swamped right now.",es:"¿Puedes ayudar? — Estoy hasta el cuello ahora."},{en:"I'm swamped this week.",es:"Esta semana estoy ocupadísimo."}] },
+  { category:"💼 Trabajo", en:"Let's touch base.", pron:"lets TACH beis", es:"Hablemos pronto. / Coordinemos.", tip:"TOUCH BASE = tocar base (béisbol). Conectar con alguien.", examples:[{en:"Let's touch base tomorrow morning.",es:"Hablemos mañana en la mañana."},{en:"Let's touch base after the meeting.",es:"Coordinemos después de la reunión."}] },
+  { category:"💼 Trabajo", en:"Can you send me that?", pron:"kan yu SEND mi DAT", es:"¿Puedes enviarme eso?", tip:"SEND = enviar. Para pedir documentos, links, archivos.", examples:[{en:"Can you send me that report?",es:"¿Puedes enviarme ese informe?"},{en:"Can you send me the link?",es:"¿Puedes enviarme el link?"}] },
+  { category:"💼 Trabajo", en:"Let's get the ball rolling.", pron:"lets GUET da BOL RO-ling", es:"Empecemos. / Pongamos las cosas en marcha.", tip:"GET THE BALL ROLLING = hacer que la pelota ruede = poner el proyecto en movimiento.", examples:[{en:"We've been planning long enough. Let's get the ball rolling.",es:"Ya planeamos suficiente. Pongamos las cosas en marcha."},{en:"Who wants to get the ball rolling?",es:"¿Quién quiere empezar?"}] },
+  { category:"💼 Trabajo", en:"We're on the same page.", pron:"wir on da SEIM PEIJ", es:"Estamos de acuerdo.", tip:"SAME PAGE = misma página. Si lees la misma página = piensas igual.", examples:[{en:"Great, I think we're on the same page.",es:"Genial, creo que estamos en la misma sintonía."},{en:"Let me make sure we're on the same page.",es:"Déjame asegurarme de que estemos de acuerdo."}] },
+  { category:"💼 Trabajo", en:"That's a no-brainer.", pron:"dats a NO-brei-ner", es:"Eso es obvio. / No hay que pensarlo dos veces.", tip:"NO-BRAINER = no necesitas cerebro para decidirlo. ¡Es tan obvio!", examples:[{en:"Should we take the higher-paying job? — That's a no-brainer!",es:"¿Tomamos el trabajo mejor pagado? — ¡No hay que pensarlo!"},{en:"It's a no-brainer — the second option is much better.",es:"Es obvio — la segunda opción es mucho mejor."}] },
+  { category:"💼 Trabajo", en:"Let's cut to the chase.", pron:"lets KAT tu da CHEIS", es:"Vamos al grano.", tip:"CUT TO THE CHASE = cortar a la persecución. Ir directo al punto.", examples:[{en:"I don't have much time. Let's cut to the chase.",es:"No tengo mucho tiempo. Vamos al grano."},{en:"Let's cut to the chase — what do you need?",es:"Vamos al grano — ¿qué necesitas?"}] },
+  { category:"💼 Trabajo", en:"Think outside the box.", pron:"ZINK aut-SAID da BOX", es:"Piensa fuera de lo convencional.", tip:"OUTSIDE THE BOX = fuera de la caja. Pensar fuera de los límites normales.", examples:[{en:"We need new ideas. Think outside the box!",es:"Necesitamos nuevas ideas. ¡Piensen fuera de lo convencional!"},{en:"She always thinks outside the box.",es:"Ella siempre piensa de manera creativa."}] },
+
+  // ===== MÁS COMIDA =====
+  { category:"🍕 Comida", en:"Can I have the menu, please?", pron:"kan ai JAV da ME-niu PLIS", es:"¿Me puede traer el menú?", tip:"MENU = menú (igual). CAN I HAVE = ¿me da?", examples:[{en:"Excuse me, can I have the menu please?",es:"Disculpe, ¿me trae el menú?"},{en:"Can I have the dessert menu please?",es:"¿Me trae la carta de postres?"}] },
+  { category:"🍕 Comida", en:"I'd like to order.", pron:"aid LAIK tu OR-der", es:"Quisiera ordenar.", tip:"I'D LIKE = quisiera (más educado que 'I want'). ORDER = pedir.", examples:[{en:"I'd like to order, please.",es:"Quisiera ordenar, por favor."},{en:"Are you ready to order? — Yes, I'd like the pasta.",es:"¿Listo para ordenar? — Sí, quisiera la pasta."}] },
+  { category:"🍕 Comida", en:"I'll pay for this.", pron:"ail PEI for DIS", es:"Yo pago esto. / Invito yo.", tip:"PAY = pagar. I'LL PAY = yo pagaré. Para invitar a alguien.", examples:[{en:"No, put your wallet away. I'll pay for this.",es:"No, guarda tu cartera. Yo pago."},{en:"I'll pay for this time.",es:"Esta vez invito yo."}] },
+  { category:"🍕 Comida", en:"I'm allergic to...", pron:"aim a-LER-jik tu", es:"Soy alérgico/a a...", tip:"ALLERGIC = alérgico (casi igual). Importante si tienes alergias alimentarias.", examples:[{en:"I'm allergic to nuts.",es:"Soy alérgico a las nueces."},{en:"I'm allergic to seafood.",es:"Soy alérgico a los mariscos."}] },
+  { category:"🍕 Comida", en:"Can I get this to go?", pron:"kan ai guet DIS tu GO", es:"¿Me lo puede empacar para llevar?", tip:"TO GO = para llevar. ¡Los americanos dicen 'to go' para pedir para llevar!", examples:[{en:"Can I get this to go, please?",es:"¿Me lo empaca para llevar?"},{en:"Is this for here or to go?",es:"¿Es para aquí o para llevar?"}] },
+
+  // ===== MÁS VIAJES =====
+  { category:"✈️ Viajes", en:"Where is the...?", pron:"WER is da", es:"¿Dónde está el/la...?", tip:"WHERE = dónde. IS = está. Simple y esencial para cualquier lugar.", examples:[{en:"Where is the bathroom?",es:"¿Dónde está el baño?"},{en:"Where is the nearest hotel?",es:"¿Dónde está el hotel más cercano?"}] },
+  { category:"✈️ Viajes", en:"I'd like a room, please.", pron:"aid LAIK a RUM PLIS", es:"Quisiera una habitación, por favor.", tip:"ROOM = habitación. I'D LIKE = quisiera. Úsala en hoteles.", examples:[{en:"I'd like a room for two nights please.",es:"Quisiera una habitación por dos noches."},{en:"I'd like a single room, please.",es:"Quisiera una habitación sencilla."}] },
+  { category:"✈️ Viajes", en:"What time does it open?", pron:"WAT taim das it O-pen", es:"¿A qué hora abre?", tip:"OPEN = abrir. WHAT TIME = a qué hora. Para museos, tiendas, atracciones.", examples:[{en:"What time does the museum open?",es:"¿A qué hora abre el museo?"},{en:"What time does the store open on Sundays?",es:"¿A qué hora abre los domingos?"}] },
+  { category:"✈️ Viajes", en:"Is there Wi-Fi here?", pron:"is der WAI-fai JIR", es:"¿Hay Wi-Fi aquí?", tip:"Wi-Fi = igual en todo el mundo. IS THERE = ¿hay? ¡La frase más universal del turismo!", examples:[{en:"Is there Wi-Fi here? What's the password?",es:"¿Hay Wi-Fi? ¿Cuál es la contraseña?"},{en:"Is there free Wi-Fi in the hotel?",es:"¿Hay Wi-Fi gratis en el hotel?"}] },
+  { category:"✈️ Viajes", en:"I'm stuck in traffic.", pron:"aim STAK in TRA-fik", es:"Estoy atascado en el tráfico.", tip:"STUCK = atascado/pegado. 'Estoy PEGADO en el tráfico'.", examples:[{en:"I'll be late, I'm stuck in traffic.",es:"Llegaré tarde, estoy atascado en el tráfico."},{en:"The traffic is terrible. I'm stuck.",es:"El tráfico está horrible. Estoy atascado."}] },
+  { category:"✈️ Viajes", en:"Can you give me a ride?", pron:"kan yu GIV mi a RAID", es:"¿Me puedes llevar? / ¿Me das un aventón?", tip:"RIDE = viaje en vehículo. GIVE A RIDE = dar un viaje = llevar a alguien.", examples:[{en:"My car broke down. Can you give me a ride?",es:"Se me averió el carro. ¿Me puedes llevar?"},{en:"Can you give me a ride to the airport?",es:"¿Me puedes llevar al aeropuerto?"}] },
+  { category:"✈️ Viajes", en:"Can you pick me up?", pron:"kan yu PIK mi AP", es:"¿Puedes venir por mí? / ¿Puedes recogerme?", tip:"PICK UP = recoger. 'Levantar hacia arriba' = recoger a alguien.", examples:[{en:"I'm at the mall. Can you pick me up?",es:"Estoy en el centro comercial. ¿Puedes venir por mí?"},{en:"Can you pick me up at 8?",es:"¿Puedes recogerme a las 8?"}] },
+
+  // ===== MÁS COMPRAS =====
+  { category:"🛍️ Compras", en:"Do you have it in another size?", pron:"du yu JAV it in a-NO-der SAIS", es:"¿Lo tiene en otra talla?", tip:"SIZE = talla. ANOTHER = otro. HAVE IT = tenerlo.", examples:[{en:"Do you have this in a larger size?",es:"¿Lo tiene en una talla más grande?"},{en:"Do you have it in size medium?",es:"¿Lo tiene en talla mediana?"}] },
+  { category:"🛍️ Compras", en:"Do you accept credit cards?", pron:"du yu ak-SEPT KRE-dit kards", es:"¿Aceptan tarjetas de crédito?", tip:"ACCEPT = aceptar (igual). CREDIT CARD = tarjeta de crédito.", examples:[{en:"Do you accept credit cards?",es:"¿Aceptan tarjetas de crédito?"},{en:"Do you accept Visa?",es:"¿Aceptan Visa?"}] },
+  { category:"🛍️ Compras", en:"I'd like to return this.", pron:"aid LAIK tu ri-TERN DIS", es:"Quisiera devolver esto.", tip:"RETURN = devolver. I'D LIKE = quisiera. Para devolver algo que compraste.", examples:[{en:"I'd like to return this, it doesn't fit.",es:"Quisiera devolverlo, no me queda."},{en:"Can I return this without a receipt?",es:"¿Puedo devolverlo sin recibo?"}] },
+  { category:"🛍️ Compras", en:"Is it on sale?", pron:"IS it on SEIL", es:"¿Está en oferta? / ¿Está rebajado?", tip:"ON SALE = en oferta especial. ¡Diferente a 'for sale' = en venta!", examples:[{en:"Is this jacket on sale?",es:"¿Está en oferta esta chaqueta?"},{en:"Everything in this store is on sale!",es:"¡Todo en esta tienda está de oferta!"}] },
+
+  // ===== MÁS SITUACIONES =====
+  { category:"🚀 Situaciones", en:"It's up to you.", pron:"its AP tu yu", es:"Tú decides. / Depende de ti.", tip:"UP TO YOU = arriba hacia ti = la decisión sube hasta ti = tú decides.", examples:[{en:"Where should we eat? — It's up to you!",es:"¿Dónde comemos? — ¡Tú decides!"},{en:"It's up to you, both options are fine.",es:"Tú decides, ambas opciones están bien."}] },
+  { category:"🚀 Situaciones", en:"What a coincidence!", pron:"WAT a ko-IN-si-dens", es:"¡Qué coincidencia!", tip:"COINCIDENCE = coincidencia (casi igual). What A = qué.", examples:[{en:"You live here too? What a coincidence!",es:"¿Tú también vives aquí? ¡Qué coincidencia!"},{en:"What a coincidence running into you here!",es:"¡Qué coincidencia encontrarte aquí!"}] },
+  { category:"🚀 Situaciones", en:"Just a second!", pron:"JAST a SEK-ond", es:"¡Un momento! / ¡Un segundo!", tip:"SECOND = segundo. JUST = solo. 'Solo un segundo' = espera un momento.", examples:[{en:"Wait, just a second!",es:"Espera, ¡un segundo!"},{en:"Just a second, I'm almost ready.",es:"Un momento, casi estoy listo."}] },
+  { category:"🚀 Situaciones", en:"That's not my problem.", pron:"dats not mai PRO-blem", es:"Ese no es mi problema.", tip:"PROBLEM = problema (igual). NOT MY = no mío. Para deslindarte.", examples:[{en:"The delivery is late. — That's not my problem.",es:"La entrega está tarde. — Ese no es mi problema."},{en:"Sorry, but that's not my problem.",es:"Lo siento, pero ese no es mi problema."}] },
+  { category:"🚀 Situaciones", en:"Watch out!", pron:"WACH AUT", es:"¡Cuidado! / ¡Aguas!", tip:"WATCH = vigilar. OUT = atención. ¡Pon atención! = ¡cuidado!", examples:[{en:"Watch out, there's a car!",es:"¡Cuidado, hay un carro!"},{en:"Watch out for the step!",es:"¡Cuidado con el escalón!"}] },
+
+  // ===== MÁS SOCIAL =====
+  { category:"🎉 Social", en:"Let's grab a coffee.", pron:"lets GRAB a KO-fi", es:"Tomemos un café.", tip:"GRAB = agarrar (informal). GRAB A COFFEE = ir a tomar café juntos.", examples:[{en:"We should catch up. Let's grab a coffee.",es:"Deberíamos ponernos al día. Tomemos un café."},{en:"Let's grab a coffee before the meeting.",es:"Tomemos un café antes de la reunión."}] },
+  { category:"🎉 Social", en:"Same here!", pron:"SEIM JIR", es:"¡Yo también! / ¡Igualmente!", tip:"SAME = mismo. HERE = aquí. 'Lo mismo aquí' = yo también.", examples:[{en:"I love Italian food. — Same here!",es:"Me encanta la comida italiana. — ¡A mí también!"},{en:"I'm exhausted. — Same here!",es:"Estoy agotado. — ¡Yo igual!"}] },
+  { category:"🎉 Social", en:"I'm down for that!", pron:"aim DAUN for DAT", es:"¡Yo me apunto! / ¡Cuenten conmigo!", tip:"DOWN = disponible/de acuerdo (informal americano). I'M DOWN = estoy listo.", examples:[{en:"Let's go to the beach. — I'm down for that!",es:"Vamos a la playa. — ¡Yo me apunto!"},{en:"Party tonight? I'm down!",es:"¿Fiesta esta noche? ¡Cuenten conmigo!"}] },
+
+  // ===== SALUD =====
+  { category:"🏥 Salud", en:"I don't feel well.", pron:"ai dont FIL WEL", es:"No me siento bien.", tip:"FEEL = sentir. WELL = bien (saludable). Para cuando estás enfermo.", examples:[{en:"I don't feel well, I think I'm sick.",es:"No me siento bien, creo que estoy enfermo."},{en:"She doesn't feel well today.",es:"Ella no se siente bien hoy."}] },
+  { category:"🏥 Salud", en:"I have a headache.", pron:"ai JAV a JED-eik", es:"Tengo dolor de cabeza.", tip:"HEAD = cabeza. ACHE = dolor. HEAD-ACHE = dolor de cabeza.", examples:[{en:"I can't concentrate, I have a headache.",es:"No puedo concentrarme, tengo dolor de cabeza."},{en:"Do you have anything for a headache?",es:"¿Tienes algo para el dolor de cabeza?"}] },
+  { category:"🏥 Salud", en:"I need to see a doctor.", pron:"ai NID tu SI a DOK-tor", es:"Necesito ver a un médico.", tip:"SEE A DOCTOR = ver al médico. NEED = necesitar.", examples:[{en:"I've had this pain for days. I need to see a doctor.",es:"Llevo días con este dolor. Necesito ver a un médico."},{en:"You should see a doctor about that.",es:"Deberías ir al médico por eso."}] },
+  { category:"🏥 Salud", en:"I'm feeling much better.", pron:"aim FIL-ing mach BE-ter", es:"Me siento mucho mejor.", tip:"FEELING = sintiendo. MUCH BETTER = mucho mejor.", examples:[{en:"How are you? — I'm feeling much better, thanks!",es:"¿Cómo estás? — Me siento mucho mejor, ¡gracias!"},{en:"I was sick but I'm feeling much better now.",es:"Estaba enfermo pero ahora me siento mucho mejor."}] },
+  { category:"🏥 Salud", en:"I'm under the weather.", pron:"aim AN-der da WE-der", es:"Me siento mal. / Estoy indispuesto.", tip:"UNDER THE WEATHER = debajo del clima. Cuando el mal tiempo te afecta.", examples:[{en:"I'm feeling a bit under the weather today.",es:"Me siento un poco mal hoy."},{en:"She's under the weather, so she won't come.",es:"Ella está indispuesta, así que no vendrá."}] },
+
+  // ===== TECNOLOGÍA =====
+  { category:"📱 Tecnología", en:"My phone is dead.", pron:"mai FON is DED", es:"Mi celular se quedó sin batería.", tip:"DEAD = muerto. Phone DEAD = sin batería. ¡Los americanos dicen esto todo el tiempo!", examples:[{en:"I can't call you, my phone is dead.",es:"No puedo llamarte, mi celular se murió."},{en:"Do you have a charger? My phone is dead.",es:"¿Tienes un cargador? Mi teléfono se quedó sin batería."}] },
+  { category:"📱 Tecnología", en:"The internet is down.", pron:"da IN-ter-net is DAUN", es:"El internet no funciona.", tip:"DOWN = caído. Internet IS DOWN = internet está caído = no funciona.", examples:[{en:"I can't work. The internet is down.",es:"No puedo trabajar. El internet está caído."},{en:"Is the internet down or is it just me?",es:"¿Se cayó el internet o soy solo yo?"}] },
+  { category:"📱 Tecnología", en:"Can you send me the link?", pron:"kan yu SEND mi da LINK", es:"¿Puedes enviarme el link?", tip:"LINK = enlace (usamos la misma palabra). SEND = enviar.", examples:[{en:"Can you send me the link to that article?",es:"¿Puedes enviarme el link de ese artículo?"},{en:"Can you send me the Zoom link?",es:"¿Puedes enviarme el link del Zoom?"}] },
+  { category:"📱 Tecnología", en:"It's not working.", pron:"its not WER-king", es:"No está funcionando. / No sirve.", tip:"WORKING = funcionando. NOT WORKING = no funciona. Para cualquier aparato.", examples:[{en:"The printer is not working again.",es:"La impresora no está funcionando de nuevo."},{en:"My app is not working, it just crashes.",es:"Mi aplicación no funciona, solo se cierra."}] },
+
+  // ===== TIEMPO =====
+  { category:"⏰ Tiempo", en:"What time is it?", pron:"WAT taim IS it", es:"¿Qué hora es?", tip:"TIME = tiempo/hora. IS IT = es. ¿Qué hora ES? La más básica de todas.", examples:[{en:"Excuse me, what time is it?",es:"Disculpe, ¿qué hora es?"},{en:"What time is it? I'm late!",es:"¿Qué hora es? ¡Estoy tarde!"}] },
+  { category:"⏰ Tiempo", en:"I'll be there in a minute.", pron:"ail bi DER in a MI-nit", es:"Llego en un minuto. / Ya voy.", tip:"A MINUTE no siempre es 60 segundos. Significa 'muy pronto'.", examples:[{en:"Where are you? — I'll be there in a minute!",es:"¿Dónde estás? — ¡Llego en un minuto!"},{en:"Hold on, I'll be there in a minute.",es:"Espera, ya voy."}] },
+  { category:"⏰ Tiempo", en:"What's the weather like?", pron:"WATS da WE-der laik", es:"¿Cómo está el clima?", tip:"WEATHER = clima. LIKE = cómo. '¿Cómo ES el clima?'", examples:[{en:"What's the weather like in London?",es:"¿Cómo está el clima en Londres?"},{en:"What's the weather like today?",es:"¿Qué tiempo hace hoy?"}] },
+  { category:"⏰ Tiempo", en:"I stayed up late.", pron:"ai STEID AP LEIT", es:"Me quedé hasta tarde. / Me trasnoché.", tip:"STAYED UP = me quedé despierto. LATE = tarde.", examples:[{en:"I'm tired. I stayed up late watching TV.",es:"Estoy cansado. Me quedé hasta tarde viendo TV."},{en:"Don't stay up too late!",es:"¡No te quedes hasta muy tarde!"}] },
+  { category:"⏰ Tiempo", en:"I overslept.", pron:"ai O-ver-SLEPT", es:"Se me pegaron las cobijas. / Dormí de más.", tip:"OVERSLEPT = dormí demasiado. OVER = demasiado. SLEPT = dormí.", examples:[{en:"I'm late! I overslept.",es:"¡Llegué tarde! Se me pegaron las cobijas."},{en:"Sorry I missed your call, I overslept.",es:"Lo siento que no atendí, me dormí de más."}] },
+
+  // ===== ACUERDO ADICIONAL =====
+  { category:"✅ Acuerdo", en:"You bet!", pron:"yu BET", es:"¡Claro que sí! / ¡Por supuesto!", tip:"YOU BET = apuéstate en eso. 'Puedes apostar que sí' = ¡por supuesto! Muy americano.", examples:[{en:"Are you coming to the game? — You bet!",es:"¿Vas al partido? — ¡Claro que sí!"},{en:"You bet I'll be there!",es:"¡Por supuesto que estaré ahí!"}] },
+  { category:"✅ Acuerdo", en:"For sure!", pron:"for SHUR", es:"¡Claro! / ¡Seguro! / ¡Definitivamente!", tip:"FOR SURE = de seguro = definitivamente. Más enfático que 'yes'.", examples:[{en:"Can you help me? — For sure!",es:"¿Puedes ayudarme? — ¡Claro!"},{en:"For sure, I'll be there.",es:"Seguro, estaré ahí."}] },
+  { category:"✅ Acuerdo", en:"Exactly!", pron:"eg-ZAK-tli", es:"¡Exactamente! / ¡Exacto!", tip:"EXACT = exacto (igual). Cuando alguien describe perfectamente lo que piensas.", examples:[{en:"So we need to plan ahead. — Exactly!",es:"Entonces necesitamos planear. — ¡Exacto!"},{en:"That's exactly what I was thinking!",es:"¡Eso es exactamente lo que pensaba!"}] },
+  { category:"✅ Acuerdo", en:"No doubt!", pron:"no DAUT", es:"¡Sin duda! / ¡Claro que sí!", tip:"DOUBT = duda. NO DOUBT = sin duda. Para confirmar algo sin reservas.", examples:[{en:"Is he talented? — No doubt!",es:"¿Es talentoso? — ¡Sin duda!"},{en:"No doubt about it, she's the best.",es:"Sin duda alguna, ella es la mejor."}] },
+  { category:"✅ Acuerdo", en:"I see your point.", pron:"ai SI yor POINT", es:"Entiendo tu punto. / Veo lo que dices.", tip:"SEE = ver. YOUR POINT = tu argumento. 'VEO tu punto de vista.'", examples:[{en:"I see your point, but I disagree.",es:"Entiendo tu punto, pero no estoy de acuerdo."},{en:"I see your point. Let me think about it.",es:"Veo lo que dices. Déjame pensarlo."}] },
+
+  // ===== REACCIONES =====
+  { category:"😲 Reacciones", en:"Are you kidding me?", pron:"ar yu KID-ing mi", es:"¿Me estás tomando el pelo?", tip:"KIDDING = bromeando. ARE YOU KIDDING ME? = ¿me estás bromeando?", examples:[{en:"They lost my reservation. Are you kidding me?",es:"Perdieron mi reserva. ¿Me estás tomando el pelo?"},{en:"Are you kidding me? This is the wrong order!",es:"¿En serio? ¡Esta es la orden equivocada!"}] },
+  { category:"😲 Reacciones", en:"Oh my goodness!", pron:"O mai GUD-nes", es:"¡Dios mío! / ¡Ay, no!", tip:"GOODNESS = bondad. Versión suave de 'Oh my God'. Para sorpresa o susto.", examples:[{en:"Oh my goodness, you scared me!",es:"¡Dios mío, me asustaste!"},{en:"Oh my goodness, what happened to you?",es:"¡Vaya, qué te pasó?"}] },
+  { category:"😲 Reacciones", en:"Unbelievable!", pron:"an-bi-LIV-a-bol", es:"¡Increíble! / ¡No puedo creerlo!", tip:"UN = no. BELIEVABLE = creíble. 'No creíble' = increíble. Para cosas buenas O malas.", examples:[{en:"That goal was unbelievable!",es:"¡Ese gol fue increíble!"},{en:"They charged me twice. This is unbelievable!",es:"Me cobraron dos veces. ¡Esto es inaceptable!"}] },
+  { category:"😲 Reacciones", en:"You're pulling my leg!", pron:"yor PUL-ing mai LEG", es:"¡Me estás tomando el pelo!", tip:"PULL = jalar. LEG = pierna. 'Jalar la pierna' = tomar el pelo = bromear.", examples:[{en:"You won the lottery? You're pulling my leg!",es:"¿Ganaste la lotería? ¡Me estás tomando el pelo!"},{en:"Are you serious or pulling my leg?",es:"¿Hablas en serio o me estás tomando el pelo?"}] },
+
+  // ===== MÁS MOTIVACIÓN =====
+  { category:"💪 Motivación", en:"Keep it up!", pron:"KIP it AP", es:"¡Sigue así! / ¡Continúa así!", tip:"KEEP = mantener. IT UP = eso arriba = mantenerlo en alto. Para alentar.", examples:[{en:"You're doing great! Keep it up!",es:"¡Lo estás haciendo genial! ¡Sigue así!"},{en:"Keep it up and you'll reach your goal.",es:"Sigue así y llegarás a tu meta."}] },
+  { category:"💪 Motivación", en:"Believe in yourself!", pron:"bi-LIV in yor-SELF", es:"¡Cree en ti mismo/a!", tip:"BELIEVE = creer. YOURSELF = tú mismo. Para motivar a quien duda de sí.", examples:[{en:"You have so much talent. Believe in yourself!",es:"Tienes tanto talento. ¡Cree en ti mismo!"},{en:"Just believe in yourself and you'll succeed.",es:"Solo cree en ti mismo y tendrás éxito."}] },
+
+  // ===== MÁS GRATITUD =====
+  { category:"🙌 Gratitud", en:"You're a lifesaver!", pron:"yor a LAIF-sei-ver", es:"¡Eres un salvavidas! / ¡Me salvaste!", tip:"LIFE = vida. SAVER = que salva. LIFESAVER = salvavidas.", examples:[{en:"You fixed my computer! You're a lifesaver!",es:"¡Arreglaste mi computadora! ¡Eres un salvavidas!"},{en:"Thanks so much, you're a lifesaver!",es:"Muchísimas gracias, ¡me salvaste!"}] },
+  { category:"🙌 Gratitud", en:"Please forgive me.", pron:"PLIS for-GIV mi", es:"Por favor, perdóname.", tip:"FORGIVE = perdonar. FOR-GIVE = para-dar. Más profundo que 'sorry'.", examples:[{en:"I hurt your feelings. Please forgive me.",es:"Te lastimé. Por favor, perdóname."},{en:"I made a mistake. Please forgive me.",es:"Cometí un error. Por favor, perdóname."}] },
+
+  // ===== MÁS EXPRESIONES =====
+  { category:"🔥 Expresiones", en:"No pain, no gain.", pron:"no PEIN no GEIN", es:"Sin esfuerzo no hay recompensa.", tip:"PAIN = dolor. GAIN = ganancia. Sin dolor no hay ganancia. ¡Muy popular!", examples:[{en:"Training is hard. But no pain, no gain!",es:"El entrenamiento es difícil. ¡Sin esfuerzo no hay recompensa!"},{en:"No pain, no gain — that's how you grow.",es:"Sin esfuerzo no hay recompensa, así se crece."}] },
+  { category:"🔥 Expresiones", en:"It's raining cats and dogs.", pron:"its REI-ning KATS and DOGS", es:"Está lloviendo a cántaros. / Está diluviando.", tip:"¡Llueven gatos y perros! = llueve muchísimo. La expresión más famosa del inglés.", examples:[{en:"Don't go out, it's raining cats and dogs!",es:"No salgas, ¡está diluviando!"},{en:"We got soaked — it was raining cats and dogs.",es:"Nos empapamos, estaba lloviendo a cántaros."}] },
+  { category:"🔥 Expresiones", en:"Once in a blue moon.", pron:"WONS in a BLU MUN", es:"De vez en cuando. / Casi nunca.", tip:"Una LUNA AZUL ocurre rarísimas veces. Algo que pasa muy raramente.", examples:[{en:"She visits once in a blue moon.",es:"Ella visita muy de vez en cuando."},{en:"I eat fast food, but only once in a blue moon.",es:"Como comida rápida, pero casi nunca."}] },
+  { category:"🔥 Expresiones", en:"The ball is in your court.", pron:"da BOL is in yor KORT", es:"La pelota está en tu cancha. / Ahora te toca a ti.", tip:"La pelota está en tu cancha — ¡igual que en español!", examples:[{en:"I've done my part. The ball is in your court.",es:"Hice mi parte. La pelota está en tu cancha."},{en:"Now the ball is in your court.",es:"Ahora te toca a ti."}] },
+  { category:"🔥 Expresiones", en:"Actions speak louder than words.", pron:"AK-shons SPIK LAU-der dan WERDZ", es:"Las acciones hablan más que las palabras.", tip:"¡Igual al español! ACTIONS = acciones. LOUDER = más fuerte. WORDS = palabras.", examples:[{en:"Don't just promise, do it. Actions speak louder than words.",es:"No solo prometas, hazlo. Las acciones hablan más que las palabras."},{en:"Show me, don't tell me.",es:"Muéstrame, no me cuentes."}] },
+  { category:"🔥 Expresiones", en:"It's not rocket science.", pron:"its not RO-ket SAI-ens", es:"No es tan difícil.", tip:"ROCKET SCIENCE = lo más difícil. 'No es tan complicado como construir cohetes'.", examples:[{en:"You can figure it out. It's not rocket science!",es:"Puedes resolverlo. ¡No es tan difícil!"},{en:"It's not rocket science, just follow the instructions.",es:"No es ciencia espacial, solo sigue las instrucciones."}] },
+  { category:"🔥 Expresiones", en:"Every cloud has a silver lining.", pron:"E-vri KLAUD jaz a SIL-ver LAI-ning", es:"No hay mal que por bien no venga.", tip:"Cada nube tiene un borde plateado = algo bueno en cada situación mala.", examples:[{en:"I lost my job, but every cloud has a silver lining.",es:"Perdí mi trabajo, pero no hay mal que por bien no venga."},{en:"Every cloud has a silver lining.",es:"No hay mal que por bien no venga."}] },
+  { category:"🔥 Expresiones", en:"Speak of the devil!", pron:"SPIK ov da DE-vol", es:"¡Hablando del rey de Roma!", tip:"¡Igual al español! Cuando aparece la persona de quien hablabas.", examples:[{en:"I was just talking about you! Speak of the devil!",es:"¡Justo estaba hablando de ti! ¡Hablando del diablo!"},{en:"Speak of the devil, here he comes!",es:"¡Hablando del rey de Roma! ¡Ahí viene!"}] },
+
+  // ===== FAMILIA =====
+  { category:"👨‍👩‍👧 Familia", en:"How's your family?", pron:"JAUS yor FA-mi-li", es:"¿Cómo está tu familia?", tip:"FAMILY = familia (casi igual). HOW'S = cómo está.", examples:[{en:"How's your family doing?",es:"¿Cómo está tu familia?"},{en:"How's the family? All good?",es:"¿Cómo está la familia? ¿Todo bien?"}] },
+  { category:"👨‍👩‍👧 Familia", en:"You mean a lot to me.", pron:"yu MIN a LOT tu mi", es:"Significas mucho para mí.", tip:"MEAN = significar. A LOT = mucho. Profunda y bonita.", examples:[{en:"Thank you for always being there. You mean a lot to me.",es:"Gracias por siempre estar. Significas mucho para mí."},{en:"You mean a lot to me and I want you to know that.",es:"Significas mucho para mí y quiero que lo sepas."}] },
+
+  // ===== DINERO =====
+  { category:"💰 Dinero", en:"Can I borrow some money?", pron:"kan ai BO-ro SOM MA-ni", es:"¿Me puedes prestar algo de dinero?", tip:"BORROW = pedir prestado. LEND = prestar. ¿Puedo BORROW? = ¿puedo pedir prestado?", examples:[{en:"Can I borrow some money until Friday?",es:"¿Me prestas dinero hasta el viernes?"},{en:"Can I borrow $10? I'll pay you back.",es:"¿Me prestas $10? Te devuelvo."}] },
+  { category:"💰 Dinero", en:"That's a rip-off!", pron:"dats a RIP of", es:"¡Eso es un robo! / ¡Eso está carísimo!", tip:"RIP OFF = rasgar/arrancar. 'Te arrancan el dinero' = te cobran demasiado.", examples:[{en:"$20 for a coffee? That's a rip-off!",es:"¿$20 por un café? ¡Eso es un robo!"},{en:"Total rip-off.",es:"Un robo total."}] },
+  { category:"💰 Dinero", en:"It's a good deal.", pron:"its a gud DIL", es:"Es una buena oferta.", tip:"DEAL = trato/oferta. GOOD DEAL = buen trato.", examples:[{en:"Buy two, get one free? That's a good deal!",es:"¿Lleva dos y paga uno? ¡Esa es una buena oferta!"},{en:"At that price, it's a really good deal.",es:"A ese precio, es un muy buen trato."}] },
+
+  // ===== BIENESTAR =====
+  { category:"🧘 Bienestar", en:"I need some alone time.", pron:"ai NID SOM a-LON taim", es:"Necesito tiempo a solas.", tip:"ALONE TIME = tiempo solo. Para cuando necesitas recargar energía.", examples:[{en:"I've been around people all day. I need some alone time.",es:"He estado con gente todo el día. Necesito tiempo a solas."},{en:"Can you give me some alone time?",es:"¿Puedes darme espacio?"}] },
+  { category:"🧘 Bienestar", en:"I need to vent.", pron:"ai NID tu VENT", es:"Necesito desahogarme.", tip:"VENT = ventilación/desahogarse. Sacar las emociones afuera.", examples:[{en:"Can I talk to you? I really need to vent.",es:"¿Puedo hablar contigo? Realmente necesito desahogarme."},{en:"Sorry for venting, but I had the worst day.",es:"Perdona que me desahogue, pero tuve el peor día."}] },
+  { category:"🧘 Bienestar", en:"I'm fed up.", pron:"aim FED AP", es:"Estoy harto/a. / Ya no aguanto más.", tip:"FED UP = alimentado hasta arriba. 'Te llenaron tanto' que ya no cabe más frustración.", examples:[{en:"I'm fed up with this situation.",es:"Estoy harto de esta situación."},{en:"I'm completely fed up. I'm quitting.",es:"Estoy completamente harto. Renuncio."}] },
+  { category:"🧘 Bienestar", en:"I'm looking forward to it.", pron:"aim LUK-ing FOR-ward tu it", es:"Estoy emocionado/ansioso por eso.", tip:"LOOK FORWARD = mirar hacia adelante. Mirar el futuro con ilusión.", examples:[{en:"The trip is next week. I'm really looking forward to it!",es:"El viaje es la próxima semana. ¡Estoy muy emocionado!"},{en:"I'm looking forward to meeting you.",es:"Estoy emocionado por conocerte."}] },
+
+  // ===== ENTRETENIMIENTO =====
+  { category:"🎬 Entretenimiento", en:"It's a must-see!", pron:"its a MAST SI", es:"¡Tienes que verlo! / ¡Es obligado verla!", tip:"MUST = debe/obligatorio. SEE = ver. MUST-SEE = que debes ver.", examples:[{en:"That movie is incredible. It's a must-see!",es:"Esa película es increíble. ¡Tienes que verla!"},{en:"If you're going to Paris, the Eiffel Tower is a must-see.",es:"Si vas a París, la Torre Eiffel es visita obligada."}] },
+  { category:"🎬 Entretenimiento", en:"I binge-watched it.", pron:"ai BINJ-wacht it", es:"Lo vi de un tirón.", tip:"BINGE = atracón. BINGE-WATCH = ver muchos episodios seguidos.", examples:[{en:"I binge-watched the whole season in one weekend.",es:"Vi toda la temporada de un tirón en un fin de semana."},{en:"I stayed up all night binge-watching.",es:"Me quedé despierto toda la noche viendo la serie."}] },
+  { category:"🎬 Entretenimiento", en:"What's on tonight?", pron:"WATS on tu-NAIT", es:"¿Qué dan esta noche?", tip:"WHAT'S ON = qué está pasando/dando. Para preguntar programación.", examples:[{en:"What's on tonight? Any good movies?",es:"¿Qué dan esta noche? ¿Alguna buena película?"},{en:"What's on at the cinema this weekend?",es:"¿Qué dan en el cine este fin de semana?"}] },
+
+  // ===== FRUSTRACIÓN =====
+  { category:"😤 Frustración", en:"This is so frustrating!", pron:"dis is so FRAS-trei-ting", es:"¡Esto es muy frustrante!", tip:"FRUSTRATING = frustrante (casi igual). Para expresar frustración.", examples:[{en:"I can't get this to work. This is so frustrating!",es:"No puedo hacer que funcione. ¡Esto es muy frustrante!"},{en:"Waiting in traffic is so frustrating.",es:"Esperar en el tráfico es muy frustrante."}] },
+  { category:"😤 Frustración", en:"Enough is enough!", pron:"e-NOF is e-NOF", es:"¡Ya basta! / ¡Suficiente es suficiente!", tip:"ENOUGH = suficiente. ENOUGH IS ENOUGH = suficiente ya es suficiente = ¡ya basta!", examples:[{en:"I've put up with this for too long. Enough is enough!",es:"Lo he aguantado demasiado. ¡Ya basta!"},{en:"He keeps lying. Enough is enough.",es:"Sigue mintiendo. Ya basta."}] },
+  { category:"😤 Frustración", en:"I'm done.", pron:"aim DON", es:"Ya terminé. / Ya no más. / Ya me cansé.", tip:"DONE = terminado. I'M DONE puede significar 'terminé' O 'ya no aguanto más'.", examples:[{en:"I'm done waiting for him. Let's go.",es:"Ya terminé de esperarlo. Vámonos."},{en:"That's it, I'm done with this job.",es:"Se acabó, ya no más con este trabajo."}] },
+
+  // ===== ROMANCE =====
+  { category:"💕 Romance", en:"You look amazing!", pron:"yu LUK a-MEI-sing", es:"¡Te ves increíble!", tip:"LOOK = verse. AMAZING = increíble. Úsala para hacer un cumplido sincero.", examples:[{en:"Wow, you look amazing tonight!",es:"¡Guau, te ves increíble esta noche!"},{en:"You look amazing in that dress.",es:"Te ves increíble con ese vestido."}] },
+  { category:"💕 Romance", en:"I have a crush on you.", pron:"ai JAV a KRASH on yu", es:"Me gustas. / Estoy enamorado/a de ti.", tip:"CRUSH = aplastamiento romántico. Cuando alguien te APLASTA el corazón.", examples:[{en:"I have to tell you something... I have a crush on you.",es:"Tengo que decirte algo... me gustas."},{en:"She's had a crush on him for months.",es:"Ella ha estado enamorada de él por meses."}] },
+  { category:"💕 Romance", en:"We broke up.", pron:"wi BROUK AP", es:"Terminamos. / Nos separamos.", tip:"BROKE UP = rompimos. BREAK UP = terminar una relación.", examples:[{en:"We broke up last month.",es:"Terminamos el mes pasado."},{en:"They broke up after 3 years together.",es:"Terminaron después de 3 años juntos."}] },
+  { category:"💕 Romance", en:"We're just friends.", pron:"wir JAST FRENDS", es:"Solo somos amigos.", tip:"JUST = solo. FRIENDS = amigos. La frase clásica cuando hay malentendidos.", examples:[{en:"Are you two dating? — No, we're just friends.",es:"¿Están saliendo? — No, solo somos amigos."},{en:"We're just friends, nothing more.",es:"Solo somos amigos, nada más."}] },
+  { category:"💕 Romance", en:"It's complicated.", pron:"its KOM-pli-kei-ted", es:"Es complicado.", tip:"COMPLICATED = complicado (casi igual). La respuesta cuando no quieres dar detalles.", examples:[{en:"Are you dating her? — It's complicated.",es:"¿Estás saliendo con ella? — Es complicado."},{en:"Our relationship is complicated right now.",es:"Nuestra relación está complicada ahora."}] },
+
+  // ===== VIDA DIARIA =====
+  { category:"🏠 Casa", en:"Make yourself at home!", pron:"MEIK yor-SELF at JOM", es:"¡Estás en tu casa! / ¡Siéntete como en casa!", tip:"AT HOME = en casa. Para recibir visitas.", examples:[{en:"Come in! Make yourself at home!",es:"¡Entra! ¡Estás en tu casa!"},{en:"Please, make yourself at home.",es:"Por favor, siéntete como en casa."}] },
+  { category:"🏠 Casa", en:"Can I use your bathroom?", pron:"kan ai YUS yor BAZ-rum", es:"¿Puedo usar tu baño?", tip:"BATHROOM = baño. USE = usar. La forma educada de pedir ir al baño en casa ajena.", examples:[{en:"Excuse me, can I use your bathroom?",es:"Disculpa, ¿puedo usar tu baño?"},{en:"Where's the bathroom?",es:"¿Dónde está el baño?"}] },
+  { category:"🏠 Casa", en:"We ran out of...", pron:"wi RAN aut ov", es:"Se nos acabó el/la...", tip:"RAN OUT = se acabó. 'Se nos fue/acabó'. Para cuando algo se termina.", examples:[{en:"We ran out of milk.",es:"Se nos acabó la leche."},{en:"We ran out of time!",es:"¡Se nos acabó el tiempo!"}] },
+  { category:"🏠 Casa", en:"What's for dinner?", pron:"WATS for DI-ner", es:"¿Qué hay para cenar?", tip:"DINNER = cena. La pregunta más universal al llegar a casa.", examples:[{en:"I'm hungry! What's for dinner?",es:"¡Tengo hambre! ¿Qué hay para cenar?"},{en:"What's for dinner tonight?",es:"¿Qué hay de cena esta noche?"}] },
+  { category:"🏠 Casa", en:"Can you turn it down?", pron:"kan yu TERN it DAUN", es:"¿Puedes bajar el volumen?", tip:"TURN DOWN = bajar (volumen). TURN UP = subir.", examples:[{en:"The music is too loud. Can you turn it down?",es:"La música está muy fuerte. ¿Puedes bajarla?"},{en:"Can you turn the TV down?",es:"¿Puedes bajar la tele?"}] },
+  // FITNESS
+  { category:"💪 Fitness", en:"I work out every day.", pron:"ai WERK aut E-vri dei", es:"Hago ejercicio todos los días.", tip:"WORK OUT = hacer ejercicio. 'Trabajar hacia afuera' = esforzarse físicamente.", examples:[{en:"I work out every morning.",es:"Hago ejercicio cada mañana."},{en:"I've been working out for 3 months.",es:"Llevo 3 meses haciendo ejercicio."}] },
+  { category:"💪 Fitness", en:"I'm out of shape.", pron:"aim AUT ov SHEIP", es:"Estoy fuera de forma.", tip:"SHAPE = forma. OUT OF SHAPE = fuera de forma. Opuesto: 'in shape'.", examples:[{en:"I need to exercise more, I'm out of shape.",es:"Necesito ejercitarme más, estoy fuera de forma."},{en:"After the holidays, I'm totally out of shape.",es:"Después de las fiestas, estoy fuera de forma."}] },
+  { category:"💪 Fitness", en:"I'm sore.", pron:"aim SOR", es:"Me duelen los músculos.", tip:"SORE = adolorido (muscular). I'M SORE = me duelen los músculos del ejercicio.", examples:[{en:"I went to the gym yesterday. I'm so sore!",es:"Fui al gym ayer. ¡Me duelen tanto los músculos!"},{en:"My legs are really sore today.",es:"Hoy me duelen mucho las piernas."}] },
+  { category:"💪 Fitness", en:"I'm on a diet.", pron:"aim on a DAI-et", es:"Estoy a dieta.", tip:"DIET = dieta (igual). ON A DIET = en una dieta.", examples:[{en:"No dessert for me, I'm on a diet.",es:"Sin postre para mí, estoy a dieta."},{en:"I've been on a diet for two weeks.",es:"Llevo dos semanas a dieta."}] },
+  // ESTUDIOS
+  { category:"📚 Estudios", en:"I aced it!", pron:"ai EIST it", es:"¡Lo saqué perfecto! / ¡Lo clavé!", tip:"ACE = as (carta). ACE IT = sacar un as = hacerlo perfecto.", examples:[{en:"How was the exam? — I aced it!",es:"¿Cómo estuvo el examen? — ¡Lo saqué perfecto!"},{en:"She aced the interview.",es:"Ella tuvo una entrevista perfecta."}] },
+  { category:"📚 Estudios", en:"I'm studying for the exam.", pron:"aim STA-di-ing for da eg-ZAM", es:"Estoy estudiando para el examen.", tip:"STUDYING = estudiando. EXAM = examen (igual).", examples:[{en:"Can you go out? — Sorry, I'm studying for the exam.",es:"¿Puedes salir? — Lo siento, estoy estudiando para el examen."},{en:"I've been studying all weekend.",es:"He estado estudiando todo el fin de semana."}] },
+  { category:"📚 Estudios", en:"Do you understand?", pron:"du yu AN-der-STAND", es:"¿Entiendes? / ¿Comprendes?", tip:"UNDERSTAND = entender. UNDER + STAND = pararse debajo para verlo bien.", examples:[{en:"This is how it works. Do you understand?",es:"Así es como funciona. ¿Entiendes?"},{en:"I don't understand this lesson.",es:"No entiendo esta lección."}] },
+  // CLIMA
+  { category:"🌤️ Clima", en:"It's freezing outside!", pron:"its FRI-sing aut-SAID", es:"¡Está helando afuera!", tip:"FREEZING = congelando. Más dramático que 'it's cold'.", examples:[{en:"Don't go out without a coat, it's freezing!",es:"No salgas sin abrigo, ¡está helando!"},{en:"It's freezing outside. I hate winter.",es:"Está helando afuera. Odio el invierno."}] },
+  { category:"🌤️ Clima", en:"It's boiling hot!", pron:"its BOI-ling JOT", es:"¡Hace un calor insoportable!", tip:"BOILING = hirviendo. HOT = caliente. 'Hirviendo de calor' = hace calor extremo.", examples:[{en:"It's boiling hot today. I can't go outside.",es:"Hoy hace un calor insoportable. No puedo salir."},{en:"How is it boiling hot in October?",es:"¿Cómo hace tanto calor en octubre?"}] },
+  { category:"🌤️ Clima", en:"What a beautiful day!", pron:"WAT a BIU-ti-ful DEI", es:"¡Qué día tan hermoso!", tip:"BEAUTIFUL = hermoso. WHAT A = qué. Para un día de clima perfecto.", examples:[{en:"Wow, what a beautiful day! Let's go for a walk.",es:"¡Guau, qué día tan hermoso! Salgamos a caminar."},{en:"What a beautiful day to be alive!",es:"¡Qué día tan hermoso para estar vivo!"}] },
+  // RUTINAS
+  { category:"⏰ Rutinas", en:"I'm a morning person.", pron:"aim a MOR-ning PER-son", es:"Soy de las mañanas.", tip:"MORNING PERSON = persona de mañana. Opuesto: NIGHT OWL = búho nocturno.", examples:[{en:"I love getting up early. I'm a morning person.",es:"Me encanta levantarme temprano. Soy de las mañanas."},{en:"Are you a morning person or a night owl?",es:"¿Eres de las mañanas o eres noctámbulo?"}] },
+  { category:"⏰ Rutinas", en:"I'm a night owl.", pron:"aim a NAIT AUL", es:"Soy noctámbulo/a.", tip:"NIGHT OWL = búho nocturno. Los búhos son activos de noche.", examples:[{en:"I can't sleep before 2am. I'm a night owl.",es:"No puedo dormir antes de las 2am. Soy noctámbulo."},{en:"She's a total night owl.",es:"Es una noctámbula total."}] },
+  { category:"⏰ Rutinas", en:"I need my coffee first.", pron:"ai NID mai KO-fi FERST", es:"Primero necesito mi café.", tip:"NEED = necesitar. FIRST = primero. La frase de millones de personas cada mañana.", examples:[{en:"Don't talk to me yet. I need my coffee first.",es:"No me hables todavía. Primero necesito mi café."},{en:"I can't function without coffee.",es:"No puedo funcionar sin café."}] },
+  // NEGOCIOS
+  { category:"🤝 Negocios", en:"I'll keep you in the loop.", pron:"ail KIP yu in da LUP", es:"Te mantendré al tanto.", tip:"LOOP = bucle/círculo. IN THE LOOP = dentro del círculo de información.", examples:[{en:"There may be changes. I'll keep you in the loop.",es:"Puede haber cambios. Te mantendré al tanto."},{en:"Keep me in the loop on this project.",es:"Mantenme informado sobre este proyecto."}] },
+  { category:"🤝 Negocios", en:"That's a deal-breaker.", pron:"dats a DIL-brei-ker", es:"Eso es inaceptable. / Eso rompe el trato.", tip:"DEAL = trato. BREAKER = rompedor. Un DEAL-BREAKER rompe cualquier posibilidad de acuerdo.", examples:[{en:"If they don't increase the salary, that's a deal-breaker.",es:"Si no aumentan el salario, eso rompe el trato."},{en:"The long commute is a deal-breaker for me.",es:"El largo viaje al trabajo es inaceptable para mí."}] },
+  { category:"🤝 Negocios", en:"Can I pick your brain?", pron:"kan ai PIK yor BREIN", es:"¿Puedo pedirte un consejo?", tip:"PICK YOUR BRAIN = escoger tu cerebro = aprovechar tu conocimiento.", examples:[{en:"You know a lot about marketing. Can I pick your brain?",es:"Sabes mucho de marketing. ¿Puedo pedirte un consejo?"},{en:"Can I pick your brain about this problem?",es:"¿Puedo preguntarte sobre este problema?"}] },
+  // CARÁCTER
+  { category:"🧠 Carácter", en:"She's down to earth.", pron:"shis DAUN tu ERZ", es:"Ella es muy sencilla. / Tiene los pies en la tierra.", tip:"DOWN TO EARTH = hacia abajo a la tierra = con los pies en la tierra = humilde y sencillo.", examples:[{en:"Despite being famous, she's very down to earth.",es:"A pesar de ser famosa, es muy sencilla."},{en:"I like him, he's really down to earth.",es:"Me cae bien, tiene los pies muy en la tierra."}] },
+  { category:"🧠 Carácter", en:"He gets on my nerves.", pron:"ji GUETS on mai NERVS", es:"Me saca de quicio. / Me irrita.", tip:"GET ON NERVES = meterse en los nervios. Alguien que te 'pisa los nervios'.", examples:[{en:"He always interrupts me. He gets on my nerves!",es:"Siempre me interrumpe. ¡Me saca de quicio!"},{en:"Stop it, you're getting on my nerves.",es:"Para ya, me estás irritando."}] },
+  { category:"🧠 Carácter", en:"She's a people person.", pron:"shis a PI-pol PER-son", es:"Ella es muy sociable.", tip:"PEOPLE PERSON = persona de personas = alguien que ama socializar.", examples:[{en:"She makes friends everywhere. She's such a people person.",es:"Hace amigos en todas partes. Es muy sociable."},{en:"I'm not really a people person, I prefer to be alone.",es:"No soy muy sociable, prefiero estar solo."}] },
+  { category:"🧠 Carácter", en:"He's full of himself.", pron:"jis FUL ov jim-SELF", es:"Él es muy creído. / Es un engreído.", tip:"FULL OF HIMSELF = lleno de sí mismo = demasiado egocéntrico.", examples:[{en:"He never listens to anyone. He's so full of himself.",es:"Nunca escucha a nadie. Es muy creído."},{en:"Don't be so full of yourself!",es:"¡No seas tan engreído!"}] },
+  // SOBRE UNO MISMO
+  { category:"👤 Sobre mí", en:"I'm into...", pron:"aim IN-tu", es:"Me gusta mucho... / Me apasiona...", tip:"INTO = metido en. I'M INTO = me apasiona. Para hobbies e intereses.", examples:[{en:"I'm really into photography.",es:"Me gusta mucho la fotografía."},{en:"Are you into sports? — Yes, I'm really into soccer.",es:"¿Te gustan los deportes? — Sí, me apasiona el fútbol."}] },
+  { category:"👤 Sobre mí", en:"I used to...", pron:"ai YUSD tu", es:"Antes solía... / Antes acostumbraba...", tip:"USED TO = solía/acostumbraba (en el pasado, ya no).", examples:[{en:"I used to live in New York.",es:"Antes vivía en Nueva York."},{en:"I used to play guitar when I was young.",es:"Solía tocar guitarra cuando era joven."}] },
+  { category:"👤 Sobre mí", en:"I tend to...", pron:"ai TEND tu", es:"Tiendo a... / Suelo...", tip:"TEND = tender/soler. I TEND TO = suelo hacer algo habitualmente.", examples:[{en:"I tend to overthink everything.",es:"Tiendo a pensar demasiado en todo."},{en:"I tend to wake up early on weekends.",es:"Suelo levantarme temprano los fines de semana."}] },
+  { category:"👤 Sobre mí", en:"I'm the type of person who...", pron:"aim da TAIP ov PER-son JU", es:"Soy el tipo de persona que...", tip:"TYPE = tipo. Para describir tu carácter y personalidad.", examples:[{en:"I'm the type of person who likes to plan everything.",es:"Soy el tipo de persona que le gusta planear todo."},{en:"I'm not the type of person who gives up easily.",es:"No soy el tipo de persona que se rinde fácilmente."}] },
+  // TRANSICIÓN
+  { category:"💬 Conversación", en:"On top of that...", pron:"on TOP ov DAT", es:"Además de eso... / Encima de eso...", tip:"ON TOP = encima. ON TOP OF THAT = además. Para agregar más información.", examples:[{en:"It was raining. On top of that, my car broke down.",es:"Estaba lloviendo. Además de eso, mi carro se averió."},{en:"The food was bad, and on top of that, it was expensive.",es:"La comida estaba mala y, encima, era cara."}] },
+  { category:"💬 Conversación", en:"In other words...", pron:"in A-der WERDZ", es:"En otras palabras... / O sea...", tip:"IN OTHER WORDS = en otras palabras. Para reformular algo.", examples:[{en:"In other words, you're saying no.",es:"En otras palabras, estás diciendo que no."},{en:"In other words, we need to start over.",es:"O sea, necesitamos empezar de nuevo."}] },
+  { category:"💬 Conversación", en:"As a matter of fact...", pron:"as a MA-ter ov FAK", es:"De hecho... / En realidad...", tip:"AS A MATTER OF FACT = de hecho. Para corregir o añadir información real.", examples:[{en:"As a matter of fact, I was there too.",es:"De hecho, yo también estuve ahí."},{en:"As a matter of fact, I know him personally.",es:"En realidad, lo conozco personalmente."}] },
+  { category:"💬 Conversación", en:"For what it's worth...", pron:"for WAT its WERZ", es:"Por lo que vale... / Aunque no importa mucho...", tip:"FOR WHAT IT'S WORTH = por lo que vale. Para dar una opinión con humildad.", examples:[{en:"For what it's worth, I think you made the right call.",es:"Por lo que vale, creo que tomaste la decisión correcta."},{en:"For what it's worth, I'm on your side.",es:"Por lo que vale, estoy de tu lado."}] },
+  { category:"💬 Conversación", en:"That's fine with me.", pron:"dats FAIN wiz mi", es:"Está bien para mí. / Me parece bien.", tip:"FINE = bien/aceptable. WITH ME = para mí.", examples:[{en:"We'll meet at noon. — That's fine with me.",es:"Nos vemos al mediodía. — Está bien para mí."},{en:"If you want to leave early, that's fine with me.",es:"Si quieres salir temprano, está bien para mí."}] },
+  { category:"💬 Conversación", en:"Come to think of it...", pron:"KOM tu ZINK ov it", es:"Ahora que lo pienso... / Pensándolo bien...", tip:"COME TO THINK = llegando a pensar = reflexionando. Para algo que acabas de recordar.", examples:[{en:"Come to think of it, I haven't eaten all day.",es:"Ahora que lo pienso, no he comido en todo el día."},{en:"Come to think of it, you're right.",es:"Pensándolo bien, tienes razón."}] },
+  // URGENCIAS
+  { category:"🚨 Urgencias", en:"Call the police!", pron:"KOL da po-LIS", es:"¡Llama a la policía!", tip:"CALL = llamar. POLICE = policía. Esencial de conocer en emergencias.", examples:[{en:"Someone stole my bag! Call the police!",es:"¡Alguien robó mi bolsa! ¡Llamen a la policía!"},{en:"Call the police, there's an emergency!",es:"¡Llamen a la policía, hay una emergencia!"}] },
+  { category:"🚨 Urgencias", en:"Is everything okay?", pron:"IS E-vri-zing o-KEI", es:"¿Está todo bien?", tip:"EVERYTHING = todo. OKAY = bien. Para verificar que alguien esté bien.", examples:[{en:"You look pale. Is everything okay?",es:"Se te ve pálido. ¿Está todo bien?"},{en:"Is everything okay in there?",es:"¿Está todo bien ahí adentro?"}] },
+
+  // ===== BATCH FINAL =====
+  { category:"💬 Conversación", en:"What's your name?", pron:"WATS yor NEIM", es:"¿Cómo te llamas? / ¿Cuál es tu nombre?", tip:"NAME = nombre. WHAT'S = qué es. ¿Qué es tu nombre? Esencial al conocer a alguien.", examples:[{en:"Hi! What's your name?",es:"¡Hola! ¿Cómo te llamas?"},{en:"What's your name again? I forgot.",es:"¿Cuál era tu nombre? Se me olvidó."}] },
+  { category:"💬 Conversación", en:"How old are you?", pron:"JAU OLD ar yu", es:"¿Cuántos años tienes?", tip:"OLD = viejo/años. HOW OLD = qué tan viejo = cuántos años. Muy directa.", examples:[{en:"If you don't mind me asking, how old are you?",es:"Si no te molesta, ¿cuántos años tienes?"},{en:"How old are you? You look so young!",es:"¿Cuántos años tienes? ¡Te ves muy joven!"}] },
+  { category:"💬 Conversación", en:"I'm not sure about that.", pron:"aim not SHUR a-BAUT DAT", es:"No estoy seguro/a de eso.", tip:"NOT SURE = no seguro. ABOUT THAT = sobre eso. Más diplomático que 'I disagree'.", examples:[{en:"I'm not sure about that plan.",es:"No estoy seguro de ese plan."},{en:"Hmm, I'm not sure about that.",es:"Hmm, no estoy seguro de eso."}] },
+  { category:"💬 Conversación", en:"That's the thing.", pron:"dats da ZING", es:"Ese es el asunto. / Ahí está el problema.", tip:"THE THING = la cosa/el asunto central. THAT'S THE THING = ese es el punto.", examples:[{en:"That's the thing, I don't have time.",es:"Ese es el asunto, no tengo tiempo."},{en:"That's the thing about living abroad.",es:"Ese es el asunto de vivir en el exterior."}] },
+  { category:"💭 Opiniones", en:"If you ask me...", pron:"if yu ASK mi", es:"Si me preguntas... / En mi opinión...", tip:"ASK = preguntar. 'Si ME preguntas' = si quieres mi opinión.", examples:[{en:"If you ask me, she's right.",es:"Si me preguntas, ella tiene razón."},{en:"If you ask me, we should leave now.",es:"En mi opinión, deberíamos irnos ahora."}] },
+  { category:"💭 Opiniones", en:"That's not my thing.", pron:"dats not mai ZING", es:"Eso no es lo mío.", tip:"MY THING = mi rollo. 'Eso no es mi rollo.' Cuando algo no te interesa.", examples:[{en:"Horror movies? That's not my thing.",es:"¿Películas de terror? No es lo mío."},{en:"Camping is not really my thing.",es:"Acampar realmente no es lo mío."}] },
+  { category:"💭 Opiniones", en:"That's the point.", pron:"dats da POINT", es:"Ese es el punto. / De eso se trata.", tip:"THE POINT = el punto central. THAT'S THE POINT = ese es el punto que quiero hacer.", examples:[{en:"We need to save money. — That's the point!",es:"Necesitamos ahorrar. — ¡Exacto, ese es el punto!"},{en:"That's the whole point of the meeting.",es:"Ese es el punto de toda la reunión."}] },
+  { category:"❤️ Emociones", en:"I'm so proud of you!", pron:"aim so PRAUD ov yu", es:"¡Estoy muy orgulloso/a de ti!", tip:"PROUD = orgulloso. Imagina un pavo real con pecho inflado.", examples:[{en:"You passed the exam! I'm so proud of you!",es:"¡Pasaste el examen! ¡Estoy muy orgulloso!"},{en:"I'm so proud of everything you've done.",es:"Estoy muy orgulloso de todo lo que has logrado."}] },
+  { category:"🎉 Social", en:"What a surprise!", pron:"WAT a ser-PRAIZ", es:"¡Qué sorpresa!", tip:"SURPRISE = sorpresa (casi igual). WHAT A = qué. ¡La misma expresión que en español!", examples:[{en:"You came all this way! What a surprise!",es:"¡Viniste desde tan lejos! ¡Qué sorpresa!"},{en:"What a surprise to see you here!",es:"¡Qué sorpresa verte aquí!"}] },
+  { category:"🎉 Social", en:"That blew my mind!", pron:"dat BLU mai MAIND", es:"¡Me voló la cabeza!", tip:"BLOW MIND = volar la mente. Sorpresa tan grande que quedas sin palabras.", examples:[{en:"That documentary blew my mind!",es:"¡Ese documental me voló la cabeza!"},{en:"The magic trick totally blew my mind.",es:"El truco de magia me dejó sin palabras."}] },
+  { category:"💪 Motivación", en:"No pain, no gain.", pron:"no PEIN no GEIN", es:"Sin esfuerzo no hay recompensa.", tip:"PAIN = dolor. GAIN = ganancia. Sin dolor no hay ganancia. ¡Muy popular!", examples:[{en:"Training is hard. But no pain, no gain!",es:"El entrenamiento es difícil. ¡Sin esfuerzo no hay recompensa!"},{en:"No pain, no gain — that's how you grow.",es:"Sin esfuerzo no hay recompensa, así se crece."}] },
+  { category:"🏥 Salud", en:"I'm under the weather.", pron:"aim AN-der da WE-der", es:"Me siento mal. / Estoy indispuesto.", tip:"UNDER THE WEATHER = debajo del clima. Cuando el mal tiempo te afecta y te enfermas.", examples:[{en:"I'm feeling a bit under the weather today.",es:"Me siento un poco mal hoy."},{en:"She's under the weather, so she won't come.",es:"Ella está indispuesta, así que no vendrá."}] },
+  { category:"💰 Dinero", en:"I'm broke.", pron:"aim BROUK", es:"Estoy pelado/a. / No tengo dinero.", tip:"BROKE = roto/sin dinero. Muy coloquial.", examples:[{en:"I can't go out tonight, I'm broke.",es:"No puedo salir esta noche, estoy pelado."},{en:"I'm broke until payday.",es:"Estoy sin dinero hasta el día de pago."}] },
+  { category:"💰 Dinero", en:"I can't afford it.", pron:"ai KANT a-FORD it", es:"No me lo puedo permitir.", tip:"AFFORD = poder permitirse algo económicamente.", examples:[{en:"I love it, but I can't afford it.",es:"Me encanta, pero no me alcanza."},{en:"We can't afford a vacation this year.",es:"No podemos permitirnos vacaciones este año."}] },
+  { category:"🧘 Bienestar", en:"I need a break.", pron:"ai NID a BREIK", es:"Necesito un descanso.", tip:"BREAK = descanso. NEED A BREAK = necesitar pausa.", examples:[{en:"I've been working for 5 hours. I need a break.",es:"Llevo 5 horas trabajando. Necesito un descanso."},{en:"Can we take a break?",es:"¿Podemos tomar un descanso?"}] },
+  { category:"🧘 Bienestar", en:"Take it easy.", pron:"TEIK it I-si", es:"Cálmate. / Relájate.", tip:"TAKE IT EASY = tómalo fácil = relájate.", examples:[{en:"You look stressed. Take it easy!",es:"Se te ve estresado. ¡Relájate!"},{en:"It's the weekend! Take it easy.",es:"¡Es fin de semana! Tómatelo con calma."}] },
+  { category:"🧘 Bienestar", en:"Let it go.", pron:"LET it GO", es:"Suéltalo. / Déjalo ir.", tip:"LET GO = soltar. Para cuando te aferras a algo que debes dejar atrás.", examples:[{en:"You can't control everything. Let it go.",es:"No puedes controlarlo todo. Suéltalo."},{en:"He's not worth it. Let it go.",es:"No vale la pena. Olvídalo."}] },
+  { category:"👨‍👩‍👧 Familia", en:"I miss you.", pron:"ai MIS yu", es:"Te extraño.", tip:"MISS = extrañar. 'Te extraño' = I miss you.", examples:[{en:"It's been months. I miss you so much.",es:"Han pasado meses. Te extraño mucho."},{en:"Come visit soon, we all miss you!",es:"Visítanos pronto, ¡todos te extrañamos!"}] },
+  { category:"👨‍👩‍👧 Familia", en:"I love you.", pron:"ai LAV yu", es:"Te quiero. / Te amo.", tip:"LOVE = amor. En inglés no hay diferencia entre 'te quiero' y 'te amo'.", examples:[{en:"Good night, mom. I love you.",es:"Buenas noches, mamá. Te quiero."},{en:"I love you more than words can say.",es:"Te amo más de lo que las palabras pueden decir."}] },
+  { category:"✈️ Viajes", en:"I'm lost.", pron:"aim LOST", es:"Estoy perdido/a.", tip:"LOST = perdido. ¡Como la serie 'LOST'!", examples:[{en:"I'm lost. Can you help me?",es:"Estoy perdido. ¿Puede ayudarme?"},{en:"I think I'm lost. Is this Main Street?",es:"Creo que estoy perdido. ¿Es esta la calle principal?"}] },
+  { category:"✈️ Viajes", en:"How long does it take?", pron:"JAU LONG das it TEIK", es:"¿Cuánto tiempo tarda?", tip:"HOW LONG = cuánto tiempo. TAKE = tomar/tardar.", examples:[{en:"How long does it take to get there?",es:"¿Cuánto se tarda en llegar?"},{en:"How long does the flight take?",es:"¿Cuánto dura el vuelo?"}] },
+  { category:"✈️ Viajes", en:"Is breakfast included?", pron:"is BREK-fast in-KLUD-ed", es:"¿El desayuno está incluido?", tip:"BREAKFAST = desayuno. INCLUDED = incluido (casi igual).", examples:[{en:"Is breakfast included in the price?",es:"¿El desayuno está incluido?"},{en:"Is Wi-Fi included?",es:"¿El Wi-Fi está incluido?"}] },
+  { category:"🍕 Comida", en:"I'm starving!", pron:"aim STAR-ving", es:"¡Estoy muerto de hambre!", tip:"STARVING = muriendo de hambre. Más dramático que 'I'm hungry'.", examples:[{en:"When do we eat? I'm starving!",es:"¿Cuándo comemos? ¡Me muero de hambre!"},{en:"I'm starving, let's order something.",es:"Estoy muerto de hambre, pidamos algo."}] },
+  { category:"🍕 Comida", en:"What do you recommend?", pron:"wat du yu re-ko-MEND", es:"¿Qué recomiendas?", tip:"RECOMMEND = recomendar (casi igual). Perfecta en restaurantes nuevos.", examples:[{en:"It's my first time here. What do you recommend?",es:"Es mi primera vez. ¿Qué recomiendas?"},{en:"What do you recommend from the menu?",es:"¿Qué recomiendas del menú?"}] },
+  { category:"🍕 Comida", en:"It's delicious!", pron:"its de-LI-shos", es:"¡Está delicioso!", tip:"DELICIOUS = delicioso (casi igual). Con 'sh' al final.", examples:[{en:"This is amazing! It's delicious!",es:"¡Esto está increíble! ¡Delicioso!"},{en:"Your mom's cooking is delicious.",es:"La cocina de tu mamá está deliciosa."}] },
+  { category:"🍕 Comida", en:"Can we get the check, please?", pron:"kan wi guet da CHEK PLIS", es:"¿Nos trae la cuenta, por favor?", tip:"CHECK = cuenta (EEUU). THE CHECK = la cuenta.", examples:[{en:"Can we get the check, please?",es:"¿Nos trae la cuenta?"},{en:"Excuse me, can we get the check?",es:"Disculpe, ¿nos puede traer la cuenta?"}] },
+  { category:"🍕 Comida", en:"Let's split the bill.", pron:"lets SPLIT da BIL", es:"Dividamos la cuenta. / A medias.", tip:"SPLIT = dividir. BILL = cuenta. SPLIT THE BILL = a medias.", examples:[{en:"Should we split the bill?",es:"¿Dividimos la cuenta?"},{en:"Let's split the bill this time.",es:"Esta vez a medias."}] },
+  { category:"🛍️ Compras", en:"How much is this?", pron:"JAU MACH is DIS", es:"¿Cuánto cuesta esto?", tip:"HOW MUCH = cuánto. THIS = esto. La más básica para comprar.", examples:[{en:"Excuse me, how much is this?",es:"Disculpe, ¿cuánto cuesta esto?"},{en:"How much is this shirt?",es:"¿Cuánto cuesta esta camisa?"}] },
+  { category:"🛍️ Compras", en:"I'm just looking.", pron:"aim jast LUK-ing", es:"Solo estoy mirando.", tip:"JUST = solo. LOOKING = mirando. Cuando el vendedor se acerca.", examples:[{en:"Can I help you? — I'm just looking, thanks.",es:"¿Le ayudo? — Solo estoy mirando."},{en:"I'm just looking around.",es:"Solo estoy dando una vuelta."}] },
+  { category:"🛍️ Compras", en:"Can I get a discount?", pron:"kan ai guet a DIS-kaunt", es:"¿Me puede dar un descuento?", tip:"DISCOUNT = descuento (casi igual). ¡Siempre vale preguntar!", examples:[{en:"Is this the final price? Can I get a discount?",es:"¿Es el precio final? ¿Me da un descuento?"},{en:"Can I get a discount if I buy two?",es:"¿Me dan descuento si compro dos?"}] },
+  { category:"🚀 Situaciones", en:"I'm on my way.", pron:"aim on mai WEI", es:"Ya voy. / Estoy en camino.", tip:"ON MY WAY = en mi camino. Imagina que estás encima de tu camino.", examples:[{en:"Where are you? — I'm on my way!",es:"¿Dónde estás? — ¡Ya voy!"},{en:"Don't start without me, I'm on my way.",es:"No empiecen sin mí, estoy en camino."}] },
+  { category:"🚀 Situaciones", en:"Never mind.", pron:"NE-ver maind", es:"No importa. / Olvídalo.", tip:"MIND = mente. NEVER MIND = nunca pongas tu mente en eso.", examples:[{en:"Never mind, I found it!",es:"¡Olvídalo, lo encontré!"},{en:"Never mind, it's not important.",es:"No importa, no es importante."}] },
+  { category:"🚀 Situaciones", en:"It's worth it.", pron:"its WERZ it", es:"Vale la pena.", tip:"WORTH = valer. WORTH IT = que vale el esfuerzo.", examples:[{en:"The hotel is expensive but it's worth it.",es:"El hotel es caro pero vale la pena."},{en:"Is the course worth it? — Totally!",es:"¿Vale la pena el curso? — ¡Totalmente!"}] },
+  { category:"🚀 Situaciones", en:"Don't worry about it.", pron:"DONT WO-ri a-BAUT it", es:"No te preocupes por eso.", tip:"WORRY = preocuparse. DON'T WORRY = no te preocupes.", examples:[{en:"I broke a glass. — Don't worry about it!",es:"Rompí un vaso. — ¡No te preocupes!"},{en:"Don't worry about it, we'll fix it.",es:"No te preocupes, lo arreglamos."}] },
+  { category:"🎉 Social", en:"Are you free tonight?", pron:"ar yu FRI tu-NAIT", es:"¿Estás libre esta noche?", tip:"FREE = libre (disponible). TONIGHT = esta noche.", examples:[{en:"Are you free tonight? Let's grab dinner.",es:"¿Estás libre esta noche? Salgamos a cenar."},{en:"Are you free this weekend?",es:"¿Estás libre este fin de semana?"}] },
+  { category:"🎉 Social", en:"Want to hang out?", pron:"WONT tu JANG aut", es:"¿Quieres que pasemos el rato?", tip:"HANG OUT = pasar el tiempo sin plan específico. Muy usada.", examples:[{en:"I'm bored. Want to hang out?",es:"Estoy aburrido. ¿Salimos?"},{en:"We should hang out more often.",es:"Deberíamos pasar más tiempo juntos."}] },
+  { category:"🎉 Social", en:"Count me in!", pron:"KAUNT mi IN", es:"¡Cuenten conmigo! / ¡Me apunto!", tip:"COUNT ME IN = cuéntame dentro = incluido. Opuesto: 'Count me out'.", examples:[{en:"We're going hiking. — Count me in!",es:"Vamos de caminata. — ¡Cuenten conmigo!"},{en:"Road trip? Count me in!",es:"¿Viaje? ¡Me apunto!"}] },
+  { category:"🎉 Social", en:"I can't make it.", pron:"ai KANT MEIK it", es:"No puedo ir.", tip:"MAKE IT = llegar/asistir. CAN'T MAKE IT = no puedo ir.", examples:[{en:"Sorry, I can't make it to the party.",es:"Lo siento, no puedo ir a la fiesta."},{en:"I can't make it tonight, I'm sick.",es:"No puedo esta noche, estoy enfermo."}] },
+  { category:"🎉 Social", en:"It's on me!", pron:"its on MI", es:"¡Yo invito! / ¡Corre por mi cuenta!", tip:"ON ME = encima de mí = es mi responsabilidad pagar.", examples:[{en:"Put your wallet away, it's on me!",es:"Guarda tu cartera, ¡yo invito!"},{en:"This round is on me!",es:"¡Esta ronda corre por mi cuenta!"}] },
+  { category:"🎉 Social", en:"What are you up to?", pron:"WAT ar yu AP tu", es:"¿Qué estás haciendo? / ¿En qué andas?", tip:"UP TO = haciendo. ¿Qué estás 'metido'?", examples:[{en:"Hey! What are you up to tonight?",es:"¡Oye! ¿Qué haces esta noche?"},{en:"What are you up to this weekend?",es:"¿Qué planes tienes este fin de semana?"}] },
+  { category:"💪 Motivación", en:"You can do it!", pron:"yu KAN du it", es:"¡Tú puedes hacerlo!", tip:"CAN = poder. DO IT = hacerlo. La frase de motivación más básica.", examples:[{en:"I'm nervous. — You can do it!",es:"Estoy nervioso. — ¡Tú puedes!"},{en:"Don't give up! You can do it!",es:"¡No te rindas! ¡Tú puedes!"}] },
+  { category:"💪 Motivación", en:"Don't give up!", pron:"DONT GIV AP", es:"¡No te rindas!", tip:"GIVE UP = rendirse. DON'T GIVE UP = no te rindas.", examples:[{en:"I want to quit. — Don't give up!",es:"Quiero dejarlo. — ¡No te rindas!"},{en:"Don't give up, you're almost there!",es:"¡No te rindas, ya casi llegas!"}] },
+  { category:"💪 Motivación", en:"You've got this!", pron:"yuv GOT dis", es:"¡Tú puedes! / ¡Lo tienes!", tip:"GOT THIS = tienes esto bajo control. ¡Ya tienes lo necesario!", examples:[{en:"Big interview today? You've got this!",es:"¿Gran entrevista hoy? ¡Tú puedes!"},{en:"Don't worry, you've got this!",es:"No te preocupes, ¡lo tienes!"}] },
+  { category:"🙌 Gratitud", en:"Thanks a lot!", pron:"ZANKS a LOT", es:"¡Muchas gracias!", tip:"THANKS = gracias. A LOT = mucho. Muchísimas gracias.", examples:[{en:"You saved me! Thanks a lot!",es:"¡Me salvaste! ¡Muchas gracias!"},{en:"Thanks a lot for your help.",es:"Muchas gracias por tu ayuda."}] },
+  { category:"🙌 Gratitud", en:"I really appreciate it.", pron:"ai RI-li a-PRI-shi-eit it", es:"Lo aprecio mucho.", tip:"APPRECIATE = apreciar (casi igual). REALLY = mucho. Para agradecer algo significativo.", examples:[{en:"You stayed late to help me. I really appreciate it.",es:"Te quedaste tarde. Te lo aprecio mucho."},{en:"I really appreciate your support.",es:"Aprecio mucho tu apoyo."}] },
+  { category:"🙌 Gratitud", en:"I owe you one.", pron:"ai O yu WAN", es:"Te debo una.", tip:"OWE = deber. YOU ONE = a ti uno. 'Te debo un favor'.", examples:[{en:"You covered for me. I owe you one!",es:"Me cubriste. ¡Te debo una!"},{en:"I owe you one for this.",es:"Te quedo debiendo por esto."}] },
+  { category:"🙌 Gratitud", en:"I'm so sorry.", pron:"aim so SO-ri", es:"Lo siento mucho.", tip:"SORRY = lo siento. SO = tanto. I'M SO SORRY = lo siento tantísimo.", examples:[{en:"I forgot your birthday. I'm so sorry.",es:"Olvidé tu cumpleaños. Lo siento mucho."},{en:"I'm so sorry for what happened.",es:"Lo siento mucho por lo que pasó."}] },
+  { category:"🔥 Expresiones", en:"Better late than never.", pron:"BE-ter LEIT dan NE-ver", es:"Mejor tarde que nunca.", tip:"LATE = tarde. NEVER = nunca. ¡Idéntico al español!", examples:[{en:"Finally done! — Better late than never!",es:"¡Por fin listo! — ¡Mejor tarde que nunca!"},{en:"Better late than never.",es:"Mejor tarde que nunca."}] },
+  { category:"🔥 Expresiones", en:"That's a piece of cake.", pron:"dats a PIS ov KEIK", es:"Eso está tirado. / Es facilísimo.", tip:"PIECE OF CAKE = pedazo de pastel. Tan fácil como comer pastel.", examples:[{en:"Was the exam hard? — Piece of cake!",es:"¿Estuvo difícil el examen? — ¡Estaba tirado!"},{en:"Don't worry, this is a piece of cake.",es:"No te preocupes, esto es facilísimo."}] },
+  { category:"🔥 Expresiones", en:"Break a leg!", pron:"BREIK a LEG", es:"¡Buena suerte! (para presentaciones)", tip:"Literalmente 'rómpete una pierna'. ¡Lo contrario de lo que dice!", examples:[{en:"I have a big presentation. — Break a leg!",es:"Tengo una gran presentación. — ¡Mucha suerte!"},{en:"Break a leg at your audition!",es:"¡Mucho éxito en tu audición!"}] },
+  { category:"🔥 Expresiones", en:"Hang in there!", pron:"JANG in DER", es:"¡Aguanta! / ¡No te rindas!", tip:"HANG = aguantar. '¡Aguanta ahí!' Para momentos difíciles.", examples:[{en:"Work is hard. Hang in there!",es:"El trabajo está difícil. ¡Aguanta!"},{en:"Hang in there, it'll get better!",es:"¡No te rindas, va a mejorar!"}] },
+  { category:"⏰ Tiempo", en:"I'm running late.", pron:"aim RUN-ing LEIT", es:"Voy tarde.", tip:"RUNNING LATE = corriendo tarde. Imagina que corres pero llegas tarde.", examples:[{en:"I'm running late, start without me.",es:"Voy tarde, empiecen sin mí."},{en:"Sorry, I'm running late. Be there in 10.",es:"Perdón, voy tarde. Llego en 10."}] },
+  { category:"⏰ Tiempo", en:"Time flies!", pron:"TAIM FLAIZ", es:"¡El tiempo vuela!", tip:"TIME = tiempo. FLIES = vuela. ¡Igual que en español!", examples:[{en:"We've known each other for 10 years. Time flies!",es:"Nos conocemos hace 10 años. ¡El tiempo vuela!"},{en:"Time flies when you're having fun.",es:"El tiempo vuela cuando la pasas bien."}] },
+  { category:"✅ Acuerdo", en:"Absolutely!", pron:"AB-so-lut-li", es:"¡Absolutamente! / ¡Por supuesto!", tip:"ABSOLUTE = absoluto (igual). Para un sí muy enfático.", examples:[{en:"Are you sure? — Absolutely!",es:"¿Estás seguro? — ¡Absolutamente!"},{en:"Do you want to go? — Absolutely!",es:"¿Quieres ir? — ¡Claro que sí!"}] },
+  { category:"✅ Acuerdo", en:"That works for me.", pron:"DAT WERKS for mi", es:"Eso me funciona. / Me parece bien.", tip:"WORKS = funciona. THAT WORKS = eso funciona = me parece bien.", examples:[{en:"How about 3pm? — That works for me!",es:"¿Qué tal las 3pm? — ¡Me funciona!"},{en:"That works for me, see you then.",es:"Eso me funciona, nos vemos."}] },
+  { category:"✅ Acuerdo", en:"Deal!", pron:"DIL", es:"¡Trato! / ¡De acuerdo!", tip:"DEAL = trato. IT'S A DEAL = es un trato. Para confirmar acuerdos.", examples:[{en:"I'll cook if you clean. — Deal!",es:"Yo cocino si tú limpias. — ¡Trato!"},{en:"Meet you at 7? — Deal!",es:"¿Nos vemos a las 7? — ¡De acuerdo!"}] },
+  { category:"😲 Reacciones", en:"No way!", pron:"no WEI", es:"¡No puede ser! / ¡Imposible!", tip:"NO WAY = no hay manera. ¡No existe manera de que eso sea verdad!", examples:[{en:"She got promoted! — No way!",es:"¡La ascendieron! — ¡No puede ser!"},{en:"No way I'm doing that!",es:"¡De ninguna manera hago eso!"}] },
+  { category:"😲 Reacciones", en:"I can't believe it!", pron:"ai KANT bi-LIV it", es:"¡No lo puedo creer!", tip:"BELIEVE = creer. CAN'T BELIEVE IT = no puedo creerlo.", examples:[{en:"You won the lottery?! I can't believe it!",es:"¿Ganaste la lotería?! ¡No lo puedo creer!"},{en:"I can't believe how fast time flies.",es:"No puedo creer lo rápido que pasa el tiempo."}] },
+];
+
+// Situations for dialogue
+const situations = [
+  {
+    id:"airport", icon:"✈️", name:"Aeropuerto", desc:"Check-in, seguridad, vuelos",
+    avatar:"👨‍✈️", agentName:"Tom", agentRole:"Agente de aeropuerto",
+    color:"#6c63ff",
+    opening:"Hello! Welcome to the check-in counter. May I see your passport and boarding pass?",
+    openingEs:"¡Hola! Bienvenido al mostrador de check-in. ¿Me puede mostrar su pasaporte y tarjeta de embarque?",
+    suggestions:["Here is my passport.","I have an e-ticket.","I'd like a window seat, please.","Is my flight on time?","Where is gate B7?"],
+    responses:{
+      default:["Of course! Let me check your reservation.", "No problem, I'll help you with that.", "Sure! Everything looks good.", "Let me verify that information for you."],
+      seat:["Great choice! I'll assign you a window seat in row 14.","Window seat confirmed! You have a great view from row 22."],
+      gate:["Gate B7 is on the second floor, turn left after security.","You'll find Gate B7 past the duty-free shops, about a 10-minute walk."],
+      time:["Your flight is on time, departing at 3:45 PM.","There's a slight delay of 20 minutes, but everything is under control."],
+      passport:["Perfect! Your documents are in order. Let me print your boarding pass.","Thank you! I can see your reservation. You're all set!"]
+    }
+  },
+  {
+    id:"restaurant", icon:"🍽️", name:"Restaurante", desc:"Ordenar, pagar, recomendar",
+    avatar:"👨‍🍳", agentName:"Sofia", agentRole:"Mesera",
+    color:"#ff6b9d",
+    opening:"Good evening! Welcome to La Bella. My name is Sofia and I'll be your server tonight. Can I start you off with something to drink?",
+    openingEs:"¡Buenas noches! Bienvenido a La Bella. Me llamo Sofia y seré su mesera esta noche. ¿Le puedo traer algo de tomar?",
+    suggestions:["I'd like some water, please.","What do you recommend?","I'll have the pasta.","Can we get the check?","It was delicious, thank you!"],
+    responses:{
+      default:["Excellent choice! I'll have that right out for you.","Of course! Coming right up.","Great! Anything else I can get for you?","Sure thing! I'll be right back."],
+      recommend:["Our chef's special tonight is the grilled salmon — it's absolutely wonderful!","I'd highly recommend the truffle pasta, it's our most popular dish!"],
+      check:["Of course! Your total is $47.50. How would you like to pay?","Right away! I'll bring the check immediately. It was a pleasure serving you!"],
+      water:["Sparkling or still?","Of course! I'll bring a bottle right away."],
+      delicious:["Thank you so much! I'll let the chef know. We hope to see you again!","That makes us so happy to hear! Please come back soon!"]
+    }
+  },
+  {
+    id:"work", icon:"💼", name:"Trabajo", desc:"Reuniones, presentaciones",
+    avatar:"👩‍💼", agentName:"Sarah", agentRole:"Colega de trabajo",
+    color:"#00f5a0",
+    opening:"Good morning! Are you ready for the team meeting at 10? I just sent you the agenda by email.",
+    openingEs:"¡Buenos días! ¿Estás listo para la reunión de equipo a las 10? Acabo de enviarte la agenda por correo.",
+    suggestions:["Yes, I'm ready!","Can you walk me through the agenda?","I'm running a bit late.","What do you think about the new project?","Let's get started."],
+    responses:{
+      default:["Sounds good! Let me know if you need anything.","Absolutely! I'll keep you posted.","Great idea! Let's touch base after the meeting.","I totally agree. Let's move forward with that."],
+      agenda:["Sure! First we'll discuss Q3 results, then the new marketing strategy, and finally team updates.","The main points are: budget review, project timeline, and new client presentation."],
+      late:["No worries! I'll save you a seat. The meeting starts in 10 minutes.","It's okay! I'll fill you in if you miss the beginning."],
+      project:["I think it's a great opportunity! The timeline is a bit tight though.","Honestly, I'm really excited about it. What do you think?"]
+    }
+  },
+  {
+    id:"date", icon:"💕", name:"Citas", desc:"Conocer gente, salir",
+    avatar:"😊", agentName:"Alex", agentRole:"Nueva amistad",
+    color:"#ff9500",
+    opening:"Hi there! I don't think we've met before. I'm Alex. Are you here for the event?",
+    openingEs:"¡Hola! Creo que no nos conocemos. Soy Alex. ¿Estás aquí por el evento?",
+    suggestions:["Nice to meet you! I'm...", "Yes, it's my first time here.","What do you do for a living?","Do you come here often?","Would you like to grab a coffee sometime?"],
+    responses:{
+      default:["That's so interesting! Tell me more about that.","Ha, that's funny! I was thinking the same thing.","Really? That's a coincidence! I love that too.","You seem really cool. I'm glad we met!"],
+      work:["Oh wow, that sounds fascinating! How long have you been doing that?","That's amazing! I've always been curious about that field."],
+      coffee:["I'd love that! Here's my number. Let's make it happen!","Absolutely! Do you know that little café on 5th street? It's great."],
+      first:["Oh really? Well, welcome! You picked a great night to come.","Same here! These events are always fun. Do you live nearby?"]
+    }
+  },
+  {
+    id:"hotel", icon:"🏨", name:"Hotel", desc:"Check-in, servicios, problemas",
+    avatar:"🛎️", agentName:"James", agentRole:"Recepcionista",
+    color:"#ffd60a",
+    opening:"Good afternoon and welcome to The Grand Hotel! Do you have a reservation?",
+    openingEs:"¡Buenas tardes y bienvenido al Grand Hotel! ¿Tiene una reserva?",
+    suggestions:["Yes, I have a reservation.","Is breakfast included?","Can I get a room with a view?","The Wi-Fi isn't working.","What time is check-out?"],
+    responses:{
+      default:["Of course! I'll take care of that right away.","Let me check on that for you immediately.","Absolutely! Is there anything else I can help you with?","No problem at all! We're here to help."],
+      breakfast:["Breakfast is included and served from 7 to 10 AM in our restaurant on the second floor.","Yes! Enjoy our buffet breakfast from 6:30 to 10:30 AM. It's complimentary!"],
+      wifi:["I'm sorry about that! The password is GrandHotel2024. Let me know if it still doesn't work.","Let me reset your room's connection. It should work in about 2 minutes."],
+      checkout:["Check-out is at noon. Would you like a late check-out? We can extend until 2 PM.","Standard check-out is at 12 PM. You can store your luggage with us if needed."],
+      view:["Wonderful choice! I'll upgrade you to a room with ocean view on the 8th floor.","We have a beautiful city view room available on the 12th floor. It's stunning at night!"]
+    }
+  },
+  {
+    id:"doctor", icon:"🏥", name:"Doctor", desc:"Síntomas, tratamiento",
+    avatar:"👨‍⚕️", agentName:"Dr. Chen", agentRole:"Médico",
+    color:"#00b4d8",
+    opening:"Good morning! I'm Dr. Chen. What brings you in today? How are you feeling?",
+    openingEs:"¡Buenos días! Soy el Dr. Chen. ¿Qué lo trae hoy? ¿Cómo se siente?",
+    suggestions:["I have a headache.","I don't feel well.","I have a fever.","How long will the treatment take?","Is it serious?"],
+    responses:{
+      default:["I see. How long have you been feeling this way?","Can you describe the pain on a scale of 1 to 10?","I understand. Let me examine you.","I'll prescribe something to help with that."],
+      headache:["I see. Is it a sharp pain or a dull ache? And how long have you had it?","Let me check your blood pressure. Headaches can have many causes — don't worry, we'll figure it out."],
+      fever:["What's your temperature? Anything above 38.5°C needs attention.","I'll prescribe something to bring it down. Make sure to drink plenty of fluids and rest."],
+      serious:["Based on what I see, it's not serious — just take the medication and rest.","Nothing to worry about! With the right treatment, you should feel better in a few days."],
+      treatment:["The treatment should take about a week. Take the medication twice a day with food.","You should see improvement in 2 to 3 days. Come back if symptoms worsen."]
+    }
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentCat = "Todas";
+let currentIdx = 0;
+let learned = new Set();
+let hardList = [];
+let streak = 0;
+let filtered = [];
+let searchQ = "";
+let avgScore = [];
+let isRecording = false;
+let recognition = null;
+let karaokeInterval = null;
+let currentSituation = null;
+let isChatRecording = false;
+
+// ============================================================
+// FLASHCARDS
+// ============================================================
+function getCats() { return ["Todas", ...new Set(phrases.map(p => p.category))]; }
+
+function filterPhrases() {
+  let base = currentCat === "Todas" ? phrases : phrases.filter(p => p.category === currentCat);
+  if (searchQ) { const q = searchQ.toLowerCase(); base = base.filter(p => p.en.toLowerCase().includes(q) || p.es.toLowerCase().includes(q)); }
+  filtered = base;
+  if (currentIdx >= filtered.length) currentIdx = 0;
+}
+
+function handleSearch() { searchQ = document.getElementById('searchInput').value; filterPhrases(); renderCard(); }
+
+function renderCats() {
+  document.getElementById('cats').innerHTML = getCats().map(c => {
+    const safe = c.replace(/'/g, "\\'");
+    return `<button class="cat${c === currentCat ? ' on' : ''}" onclick="selectCat('${safe}')">${c}</button>`;
+  }).join('');
+}
+
+function selectCat(c) { currentCat = c; currentIdx = 0; filterPhrases(); renderCats(); renderCard(); }
+
+function renderCard() {
+  const empty = document.getElementById('empty-state');
+  const fc = document.getElementById('fc');
+  if (filtered.length === 0) { empty.style.display = 'block'; fc.style.display = 'none'; updateStats(); return; }
+  empty.style.display = 'none'; fc.style.display = 'block';
+  fc.classList.remove('anim'); void fc.offsetWidth; fc.classList.add('anim');
+
+  const p = filtered[currentIdx];
+  document.getElementById('fc-cat').textContent = p.category;
+  document.getElementById('fc-num').textContent = `${currentIdx + 1}/${filtered.length}`;
+  document.getElementById('fc-pron').textContent = '🔊 ' + p.pron;
+  document.getElementById('fc-es').innerHTML = `<strong>${p.es}</strong>`;
+  document.getElementById('fc-tip').textContent = p.tip;
+  document.getElementById('fc-exs').innerHTML = p.examples.map(e => `<div class="ex"><div class="ex-en">${e.en}</div><div class="ex-es">${e.es}</div></div>`).join('');
+
+  // Build karaoke words
+  const words = p.en.split(' ');
+  document.getElementById('karaoke-phrase').innerHTML = words.map((w, i) => `<span class="k-word idle" id="kw-${i}">${w}</span>`).join('');
+
+  // Reset pronunciation result
+  document.getElementById('pronun-result').classList.remove('show');
+  document.getElementById('mic-hint').textContent = 'Toca 🎤 para practicar tu pronunciación con karaoke';
+  document.getElementById('mic-btn').classList.remove('recording');
+  isRecording = false;
+
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('s-learned').textContent = learned.size;
+  document.getElementById('s-total').textContent = phrases.length;
+  document.getElementById('s-streak').textContent = streak;
+  const avg = avgScore.length ? Math.round(avgScore.reduce((a,b)=>a+b,0)/avgScore.length) : null;
+  document.getElementById('s-score').textContent = avg !== null ? avg + '%' : '-';
+  document.getElementById('prog-txt').textContent = `${learned.size} / ${phrases.length}`;
+  document.getElementById('prog-fill').style.width = `${(learned.size/phrases.length)*100}%`;
+  document.getElementById('streak-big').textContent = streak;
+  const rl = document.getElementById('review-list');
+  rl.innerHTML = hardList.length === 0 ? '<li>Nada aún 🎉<span></span></li>' : hardList.slice(0,4).map(p=>`<li>${p.en.length>22?p.en.slice(0,22)+'…':p.en}<span>Repasar</span></li>`).join('');
+}
+
+function nextCard() { if(!filtered.length) return; currentIdx = (currentIdx+1)%filtered.length; renderCard(); }
+function prevCard() { if(!filtered.length) return; currentIdx = (currentIdx-1+filtered.length)%filtered.length; renderCard(); }
+
+function markKnown() {
+  if(!filtered.length) return;
+  learned.add(filtered[currentIdx].en); streak++;
+  toast('¡Genial! 🔥 Racha: '+streak, false); nextCard();
+}
+function markHard() {
+  if(!filtered.length) return;
+  const p = filtered[currentIdx];
+  if(!hardList.find(x=>x.en===p.en)) hardList.push(p);
+  streak = 0; toast('La revisamos luego 📚', true); nextCard();
+}
+
+function speakPhrase() {
+  if(!filtered.length || !('speechSynthesis' in window)) return;
+  const p = filtered[currentIdx];
+  window.speechSynthesis.cancel();
+  // Karaoke sync while speaking
+  const words = p.en.split(' ');
+  const utter = new SpeechSynthesisUtterance(p.en);
+  utter.lang = 'en-US'; utter.rate = 0.82;
+
+  // Estimate timing per word
+  const totalDuration = (p.en.length * 60) + (words.length * 200);
+  const wordDuration = totalDuration / words.length;
+  let wordIdx = 0;
+  // Reset all
+  words.forEach((_,i) => { const el = document.getElementById('kw-'+i); if(el){ el.className='k-word idle'; } });
+
+  utter.onstart = () => {
+    wordIdx = 0;
+    karaokeInterval = setInterval(() => {
+      if(wordIdx > 0) { const prev = document.getElementById('kw-'+(wordIdx-1)); if(prev) prev.className='k-word idle'; }
+      const el = document.getElementById('kw-'+wordIdx);
+      if(el) { el.className='k-word active'; }
+      wordIdx++;
+      if(wordIdx >= words.length) { clearInterval(karaokeInterval); }
+    }, wordDuration);
+  };
+  utter.onend = () => {
+    clearInterval(karaokeInterval);
+    words.forEach((_,i) => { const el = document.getElementById('kw-'+i); if(el) el.className='k-word idle'; });
+  };
+  window.speechSynthesis.speak(utter);
+}
+
+// ============================================================
+// PRONUNCIATION / SPEECH RECOGNITION
+// ============================================================
+function toggleMic() {
+  if(!filtered.length) return;
+  if(isRecording) { stopRecognition(); return; }
+  startRecognition();
+}
+
+function startRecognition() {
+  if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    toast('Tu navegador no soporta reconocimiento de voz. Usa Chrome.', true); return;
+  }
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRec();
+  recognition.lang = 'en-US';
+  recognition.interimResults = true;
+  recognition.continuous = false;
+
+  const phrase = filtered[currentIdx];
+  const words = phrase.en.toLowerCase().split(' ');
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('mic-btn').classList.add('recording');
+    document.getElementById('mic-hint').textContent = '🎤 Escuchando... Habla ahora';
+    // Start karaoke animation while user speaks
+    let wIdx = 0;
+    words.forEach((_,i) => { const el = document.getElementById('kw-'+i); if(el) el.className='k-word idle'; });
+    karaokeInterval = setInterval(() => {
+      if(wIdx > 0) { const prev = document.getElementById('kw-'+(wIdx-1)); if(prev) prev.className='k-word idle'; }
+      const el = document.getElementById('kw-'+wIdx);
+      if(el) el.className='k-word active';
+      wIdx = (wIdx+1) % words.length;
+    }, 350);
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results).map(r=>r[0].transcript).join(' ').toLowerCase().trim();
+    if(event.results[0].isFinal) {
+      clearInterval(karaokeInterval);
+      scorePronunciation(phrase.en, transcript);
+    }
+  };
+
+  recognition.onerror = () => {
+    clearInterval(karaokeInterval);
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+    document.getElementById('mic-hint').textContent = 'Toca 🎤 para practicar tu pronunciación con karaoke';
+    toast('No te escuché. Inténtalo de nuevo.', true);
+    words.forEach((_,i) => { const el = document.getElementById('kw-'+i); if(el) el.className='k-word idle'; });
+  };
+
+  recognition.onend = () => {
+    clearInterval(karaokeInterval);
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+  };
+
+  recognition.start();
+}
+
+function stopRecognition() { if(recognition) { recognition.stop(); } clearInterval(karaokeInterval); }
+
+function scorePronunciation(original, spoken) {
+  const origWords = original.toLowerCase().replace(/[^a-z\s]/g,'').split(' ');
+  const spokenWords = spoken.toLowerCase().replace(/[^a-z\s]/g,'').split(' ');
+
+  // Score each word
+  const wordResults = origWords.map((word, i) => {
+    const spoken = spokenWords[i] || '';
+    const score = wordSimilarity(word, spoken);
+    return { word: original.split(' ')[i], score };
+  });
+
+  const totalScore = Math.round(wordResults.reduce((a,b)=>a+b.score,0) / wordResults.length);
+  avgScore.push(totalScore);
+  if(avgScore.length > 20) avgScore.shift();
+
+  // Color karaoke words
+  wordResults.forEach((r, i) => {
+    const el = document.getElementById('kw-'+i);
+    if(el) {
+      if(r.score >= 80) el.className = 'k-word good';
+      else if(r.score >= 50) el.className = 'k-word ok';
+      else el.className = 'k-word bad';
+    }
+  });
+
+  // Show result panel
+  const result = document.getElementById('pronun-result');
+  result.classList.add('show');
+
+  const circle = document.getElementById('score-circle');
+  const msg = document.getElementById('score-msg');
+  const wScores = document.getElementById('word-scores');
+
+  let cls, emoji, text;
+  if(totalScore >= 80) { cls='great'; emoji='🎉'; text='¡Excelente pronunciación!'; }
+  else if(totalScore >= 55) { cls='good'; emoji='👍'; text='¡Bien! Sigue practicando'; }
+  else { cls='bad'; emoji='💪'; text='Escucha la frase y vuelve a intentar'; }
+
+  circle.className = `score-circle ${cls}`;
+  circle.textContent = totalScore + '%';
+  msg.innerHTML = `<strong>${emoji} ${text}</strong>Dijiste: "<em>${spoken || '(nada detectado)'}</em>"`;
+
+  wScores.innerHTML = wordResults.map(r => {
+    const c = r.score >= 80 ? 'great' : r.score >= 50 ? 'good' : 'bad';
+    return `<span class="ws ${c}">${r.word} ${r.score}%</span>`;
+  }).join('');
+
+  document.getElementById('mic-hint').textContent = totalScore >= 80 ? '¡Perfecto! Toca de nuevo para repetir' : 'Toca 🎤 para intentar de nuevo';
+  updateStats();
+}
+
+function wordSimilarity(a, b) {
+  if(!a || !b) return 0;
+  if(a === b) return 100;
+  const la = a.toLowerCase(), lb = b.toLowerCase();
+  if(la === lb) return 100;
+  // Levenshtein distance
+  const m = la.length, n = lb.length;
+  const dp = Array.from({length:m+1}, (_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++) {
+    dp[i][j] = la[i-1]===lb[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  }
+  const maxLen = Math.max(m,n);
+  return Math.round((1 - dp[m][n]/maxLen)*100);
+}
+
+// ============================================================
+// DIALOGUE / SITUATIONS
+// ============================================================
+function renderSituations() {
+  document.getElementById('sit-grid').innerHTML = situations.map(s => `
+    <div class="sit-card${currentSituation?.id===s.id?' active-sit':''}" onclick="selectSituation('${s.id}')">
+      <div class="sit-icon">${s.icon}</div>
+      <div class="sit-name">${s.name}</div>
+      <div class="sit-desc">${s.desc}</div>
+    </div>
+  `).join('');
+}
+
+function selectSituation(id) {
+  currentSituation = situations.find(s=>s.id===id);
+  renderSituations();
+  document.getElementById('dialogue-box').classList.add('show');
+
+  // Set header
+  document.getElementById('d-avatar').textContent = currentSituation.avatar;
+  document.getElementById('d-avatar').style.background = currentSituation.color + '22';
+  document.getElementById('d-name').textContent = currentSituation.agentName;
+  document.getElementById('d-role').textContent = currentSituation.agentRole;
+
+  // Clear chat and start
+  const chat = document.getElementById('chat-area');
+  chat.innerHTML = '';
+  setTimeout(() => addTheirBubble(currentSituation.opening, currentSituation.openingEs), 600);
+
+  // Suggestions
+  renderSuggestions(currentSituation.suggestions);
+  document.getElementById('dialogue-box').scrollIntoView({behavior:'smooth'});
+}
+
+function renderSuggestions(sugs) {
+  document.getElementById('suggestions').innerHTML = sugs.map(s=>`<button class="sug" onclick="useSuggestion('${s.replace(/'/g,"\\'")}')"> ${s}</button>`).join('');
+}
+
+function useSuggestion(text) {
+  document.getElementById('chat-input').value = text;
+  sendChat();
+}
+
+function addTheirBubble(text, trans) {
+  const chat = document.getElementById('chat-area');
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(typing);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    chat.removeChild(typing);
+    const b = document.createElement('div');
+    b.className = 'bubble them';
+    b.innerHTML = `${text}${trans?`<div class="bubble-trans">${trans}</div>`:''}`;
+    chat.appendChild(b);
+    chat.scrollTop = chat.scrollHeight;
+
+    // Speak it
+    if('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US'; u.rate = 0.88;
+      window.speechSynthesis.speak(u);
+    }
+  }, 1200);
+}
+
+function addMyBubble(text, scoreData) {
+  const chat = document.getElementById('chat-area');
+  const b = document.createElement('div');
+  b.className = 'bubble me';
+  let inner = text;
+  if(scoreData) {
+    const cls = scoreData.score >= 80 ? 'great' : scoreData.score >= 55 ? 'good' : 'bad';
+    inner += `<div class="bubble-trans">${scoreData.trans || ''}</div><span class="score-badge ${cls}">🎤 ${scoreData.score}% pronunciación</span>`;
+  }
+  b.innerHTML = inner;
+  chat.appendChild(b);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text || !currentSituation) return;
+  input.value = '';
+
+  addMyBubble(text);
+
+  // Detect intent and pick response
+  const lower = text.toLowerCase();
+  const resp = currentSituation.responses;
+  let reply = null, replyKey = null;
+
+  for(const key of Object.keys(resp)) {
+    if(key === 'default') continue;
+    if(lower.includes(key)) { replyKey = key; break; }
+  }
+
+  const pool = replyKey && resp[replyKey] ? resp[replyKey] : resp.default;
+  reply = pool[Math.floor(Math.random()*pool.length)];
+
+  setTimeout(() => addTheirBubble(reply), 800);
+
+  // Update suggestions based on conversation
+  const newSugs = currentSituation.suggestions.filter(s => !lower.includes(s.toLowerCase().substring(0,8)));
+  if(newSugs.length > 0) renderSuggestions(newSugs.slice(0,4));
+}
+
+// SPEECH IN CHAT
+function toggleMicChat() {
+  if(isChatRecording) { stopMicChat(); return; }
+  startMicChat();
+}
+
+function startMicChat() {
+  if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    toast('Usa Chrome para reconocimiento de voz.', true); return;
+  }
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SpeechRec();
+  rec.lang = 'en-US'; rec.interimResults = false;
+  rec.onstart = () => { isChatRecording = true; document.getElementById('mic-chat-btn').classList.add('recording'); };
+  rec.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const confidence = Math.round(event.results[0][0].confidence * 100);
+    document.getElementById('chat-input').value = transcript;
+
+    // Auto-send with score
+    if(!currentSituation) return;
+    document.getElementById('chat-input').value = '';
+    addMyBubble(transcript, { score: confidence || 75, trans: '' });
+
+    const lower = transcript.toLowerCase();
+    let replyKey = null;
+    for(const key of Object.keys(currentSituation.responses)) {
+      if(key === 'default') continue;
+      if(lower.includes(key)) { replyKey = key; break; }
+    }
+    const pool = replyKey ? currentSituation.responses[replyKey] : currentSituation.responses.default;
+    const reply = pool[Math.floor(Math.random()*pool.length)];
+    setTimeout(() => addTheirBubble(reply), 800);
+  };
+  rec.onerror = () => { isChatRecording = false; document.getElementById('mic-chat-btn').classList.remove('recording'); };
+  rec.onend = () => { isChatRecording = false; document.getElementById('mic-chat-btn').classList.remove('recording'); };
+  rec.start();
+}
+function stopMicChat() { isChatRecording = false; document.getElementById('mic-chat-btn').classList.remove('recording'); }
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, bad) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (bad ? ' bad' : '');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+
+// ============================================================
+// MY PHRASES FEATURE
+// ============================================================
+let myPhrases = JSON.parse(localStorage.getItem('speakpro_myphrases') || '[]');
+let mpFilter = 'Todas';
+let pendingPhrase = null;
+
+function saveToStorage() {
+  localStorage.setItem('speakpro_myphrases', JSON.stringify(myPhrases));
+}
+
+// Populate category selector
+function populateCatSelect() {
+  const sel = document.getElementById('new-phrase-cat');
+  const cats = ['⭐ Mis Frases', ...new Set(phrases.map(p => p.category))];
+  sel.innerHTML = cats.map(c => `<option value="${c}">${c === '⭐ Mis Frases' ? '⭐ Mis Frases (por defecto)' : c}</option>`).join('');
+}
+
+async function generatePhrase() {
+  const input = document.getElementById('ai-phrase-input').value.trim();
+  if (!input) { toast('Escribe una frase en inglés primero', true); return; }
+
+  const genDiv = document.getElementById('ai-generating');
+  const genText = document.getElementById('ai-gen-text');
+  const preview = document.getElementById('preview-card');
+  const saveBtn = document.getElementById('btn-save-phrase');
+
+  genDiv.classList.add('show');
+  preview.classList.remove('show');
+  saveBtn.disabled = true;
+  pendingPhrase = null;
+
+  const steps = [
+    'Analizando la frase...',
+    'Generando pronunciación fonética...',
+    'Traduciendo al español...',
+    'Creando truco de memoria...',
+    'Armando ejemplos de conversación...'
+  ];
+  let step = 0;
+  const stepInterval = setInterval(() => {
+    if (step < steps.length) { genText.textContent = steps[step++]; }
+  }, 600);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Eres un experto en enseñar inglés a hispanohablantes.
+Para la frase en inglés: "${input}"
+
+Genera un JSON EXACTAMENTE en este formato (sin texto extra, sin markdown, sin backticks):
+{
+  "en": "la frase exacta en inglés",
+  "pron": "pronunciación fonética en MAYÚSCULAS estilo español, ej: WATS ap",
+  "es": "traducción natural al español",
+  "tip": "truco de memoria divertido que conecta la frase con algo conocido en español, máximo 2 oraciones",
+  "examples": [
+    {"en": "ejemplo 1 en inglés en contexto conversacional", "es": "traducción del ejemplo 1"},
+    {"en": "ejemplo 2 en inglés en contexto conversacional", "es": "traducción del ejemplo 2"}
+  ]
+}
+
+Solo responde con el JSON, nada más.`
+        }]
+      })
+    });
+
+    clearInterval(stepInterval);
+
+    if (!response.ok) {
+      throw new Error('API error: ' + response.status);
+    }
+
+    const data = await response.json();
+    const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+
+    let parsed;
+    try {
+      const clean = text.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      throw new Error('No se pudo procesar la respuesta');
+    }
+
+    pendingPhrase = parsed;
+
+    document.getElementById('prev-en').textContent = parsed.en;
+    document.getElementById('prev-pron').textContent = '🔊 ' + parsed.pron;
+    document.getElementById('prev-es').textContent = parsed.es;
+    document.getElementById('prev-tip').textContent = '💡 ' + parsed.tip;
+    document.getElementById('prev-exs').innerHTML = parsed.examples.map(e =>
+      `<div class="ex"><div class="ex-en">${e.en}</div><div class="ex-es">${e.es}</div></div>`
+    ).join('');
+
+    genDiv.classList.remove('show');
+    preview.classList.add('show');
+    saveBtn.disabled = false;
+    toast('¡IA completó la frase! Revisa y guarda 🎉', false);
+
+  } catch(err) {
+    clearInterval(stepInterval);
+    genDiv.classList.remove('show');
+    console.error('Error:', err);
+
+    // Fallback: generate locally with smart patterns
+    genText && (genText.textContent = 'Generando localmente...');
+    genDiv.classList.add('show');
+
+    setTimeout(() => {
+      const phrase = input.trim();
+      const words = phrase.split(' ');
+
+      // Smart phonetic approximation
+      const phonMap = {'a':'a','e':'e','i':'ai','o':'o','u':'iu','th':'z','wh':'w','ch':'ch','sh':'sh','ph':'f','tion':'shon','ing':'ing','ed':'d','er':'er','or':'or','ar':'ar','ck':'k','gh':'','kn':'n','wr':'r','mb':'m','bt':'t','lk':'k'};
+      function toPron(word) {
+        let w = word.toLowerCase().replace(/[^a-z]/g,'');
+        for (const [k,v] of Object.entries(phonMap)) w = w.split(k).join(v);
+        return w.toUpperCase();
+      }
+      const pron = words.map(toPron).join('-');
+
+      const result = {
+        en: phrase,
+        pron: pron,
+        es: '(Traducción pendiente — edita manualmente)',
+        tip: `Recuerda: "${phrase}" — practica diciéndola 3 veces en voz alta para memorizarla.`,
+        examples: [
+          { en: `I often say "${phrase}" in conversations.`, es: `A menudo digo "${phrase}" en conversaciones.` },
+          { en: `Have you heard the phrase "${phrase}" before?`, es: `¿Has escuchado la frase "${phrase}" antes?` }
+        ]
+      };
+
+      pendingPhrase = result;
+      document.getElementById('prev-en').textContent = result.en;
+      document.getElementById('prev-pron').textContent = '🔊 ' + result.pron;
+      document.getElementById('prev-es').textContent = result.es;
+      document.getElementById('prev-tip').textContent = '💡 ' + result.tip;
+      document.getElementById('prev-exs').innerHTML = result.examples.map(e =>
+        `<div class="ex"><div class="ex-en">${e.en}</div><div class="ex-es">${e.es}</div></div>`
+      ).join('');
+
+      genDiv.classList.remove('show');
+      preview.classList.add('show');
+      saveBtn.disabled = false;
+      toast('⚠️ Generado localmente. La IA no estaba disponible.', true);
+    }, 1500);
+  }
+}
+
+function savePhrase() {
+  if (!pendingPhrase) return;
+  const cat = document.getElementById('new-phrase-cat').value;
+  const newPhrase = { ...pendingPhrase, category: cat, id: Date.now(), isCustom: true };
+  myPhrases.unshift(newPhrase);
+  saveToStorage();
+
+  // Reset form
+  document.getElementById('ai-phrase-input').value = '';
+  document.getElementById('preview-card').classList.remove('show');
+  document.getElementById('btn-save-phrase').disabled = true;
+  pendingPhrase = null;
+
+  renderMyPhrases();
+  toast('¡Frase guardada! ✅', false);
+}
+
+function deletePhrase(id) {
+  myPhrases = myPhrases.filter(p => p.id !== id);
+  saveToStorage();
+  renderMyPhrases();
+  toast('Frase eliminada', true);
+}
+
+function renderMpFilters() {
+  const cats = ['Todas', '⭐ Mis Frases', ...new Set(myPhrases.filter(p => p.category !== '⭐ Mis Frases').map(p => p.category))];
+  document.getElementById('mp-filters').innerHTML = cats.map(c =>
+    `<button class="mpf-btn${c === mpFilter ? ' on' : ''}" onclick="setMpFilter('${c.replace(/'/g,"\'")}')"> ${c}</button>`
+  ).join('');
+}
+
+function setMpFilter(cat) {
+  mpFilter = cat;
+  renderMyPhrases();
+}
+
+function renderMyPhrases() {
+  document.getElementById('mp-count-num').textContent = myPhrases.length;
+  renderMpFilters();
+
+  const filtered = mpFilter === 'Todas' ? myPhrases : myPhrases.filter(p => p.category === mpFilter);
+  const list = document.getElementById('mp-list');
+
+  if (myPhrases.length === 0) {
+    list.innerHTML = `
+      <div class="mp-empty">
+        <div class="mp-empty-icon">✨</div>
+        <h3>Aún no tienes frases personales</h3>
+        <p>Escribe cualquier frase en inglés arriba y la IA la completará automáticamente con pronunciación, traducción, truco de memoria y ejemplos.</p>
+      </div>`;
+    return;
+  }
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="mp-empty"><div class="mp-empty-icon">🔍</div><h3>Sin frases en esta categoría</h3></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(p => `
+    <div class="mp-phrase-card" id="mpcard-${p.id}">
+      <div class="mp-card-en">${p.en}</div>
+      <div class="mp-card-pron">🔊 ${p.pron}</div>
+      <div class="mp-card-es">${p.es}</div>
+      <div class="mp-card-tip">${p.tip}</div>
+      <div class="mp-card-exs">
+        ${p.examples.map(e => `<div class="mp-card-ex">${e.en}<div class="mp-card-ex-es">${e.es}</div></div>`).join('')}
+      </div>
+      <div class="mp-card-actions">
+        <button class="mp-btn-practice" onclick="practiceMyPhrase(${p.id})">🎤 Practicar con karaoke</button>
+        <button class="mp-btn-delete" onclick="deletePhrase(${p.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function practiceMyPhrase(id) {
+  const p = myPhrases.find(x => x.id === id);
+  if (!p) return;
+
+  const modal = document.getElementById('practice-modal');
+  const content = document.getElementById('modal-content');
+  const words = p.en.split(' ');
+
+  content.innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px">🎤 Modo Karaoke</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="modal-karaoke">
+        ${words.map((w,i) => `<span class="k-word idle" id="mkw-${i}">${w}</span>`).join('')}
+      </div>
+      <div style="font-size:14px;color:var(--accent2);font-style:italic;margin-bottom:8px">🔊 ${p.pron}</div>
+      <div style="font-size:15px;color:var(--muted);margin-bottom:20px">${p.es}</div>
+    </div>
+    <div id="modal-pronun-result" style="display:none;margin-bottom:16px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-speak" style="flex:0;padding:13px 18px" onclick="speakModalPhrase('${p.en.replace(/'/g,"\'")}', ${words.length})">🔊</button>
+      <button class="btn btn-mic" id="modal-mic-btn" style="flex:1" onclick="toggleModalMic('${p.en.replace(/'/g,"\'").replace(/"/g,'&quot;')}')">🎤 Pronunciar</button>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:10px">Toca 🔊 para escuchar, 🎤 para practicar</div>
+  `;
+  modal.classList.add('show');
+}
+
+function speakModalPhrase(text, wordCount) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const words = text.split(' ');
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US'; utter.rate = 0.82;
+  const dur = (text.length * 60 + words.length * 200) / words.length;
+  let wi = 0;
+  words.forEach((_,i) => { const el = document.getElementById('mkw-'+i); if(el) el.className='k-word idle'; });
+  const iv = setInterval(() => {
+    if(wi > 0) { const prev = document.getElementById('mkw-'+(wi-1)); if(prev) prev.className='k-word idle'; }
+    const el = document.getElementById('mkw-'+wi);
+    if(el) el.className='k-word active';
+    wi++;
+    if(wi >= words.length) clearInterval(iv);
+  }, dur);
+  utter.onend = () => { clearInterval(iv); words.forEach((_,i) => { const el = document.getElementById('mkw-'+i); if(el) el.className='k-word idle'; }); };
+  window.speechSynthesis.speak(utter);
+}
+
+let modalRecording = false;
+function toggleModalMic(phraseText) {
+  if (modalRecording) return;
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    toast('Reconocimiento de voz solo disponible en Chrome', true); return;
+  }
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SpeechRec();
+  rec.lang = 'en-US'; rec.interimResults = false;
+  const btn = document.getElementById('modal-mic-btn');
+  const origWords = phraseText.toLowerCase().replace(/[^a-z\s]/g,'').split(' ');
+
+  rec.onstart = () => {
+    modalRecording = true;
+    if(btn) { btn.textContent = '🔴 Escuchando...'; btn.classList.add('recording'); }
+    let wi = 0;
+    origWords.forEach((_,i) => { const el = document.getElementById('mkw-'+i); if(el) el.className='k-word idle'; });
+    window._modalKarIv = setInterval(() => {
+      if(wi>0){const prev=document.getElementById('mkw-'+(wi-1));if(prev)prev.className='k-word idle';}
+      const el=document.getElementById('mkw-'+wi);
+      if(el)el.className='k-word active';
+      wi=(wi+1)%origWords.length;
+    }, 350);
+  };
+
+  rec.onresult = (event) => {
+    clearInterval(window._modalKarIv);
+    const spoken = event.results[0][0].transcript.toLowerCase().replace(/[^a-z\s]/g,'').split(' ');
+    const results = origWords.map((w, i) => ({ word: phraseText.split(' ')[i] || w, score: wordSimilarity(w, spoken[i] || '') }));
+    const total = Math.round(results.reduce((a,b)=>a+b.score,0)/results.length);
+
+    results.forEach((r,i) => {
+      const el = document.getElementById('mkw-'+i);
+      if(el) el.className = 'k-word ' + (r.score>=80?'good':r.score>=50?'ok':'bad');
+    });
+
+    const cls = total>=80?'great':total>=55?'good':'bad';
+    const emoji = total>=80?'🎉':total>=55?'👍':'💪';
+    const msg = total>=80?'¡Excelente pronunciación!':total>=55?'¡Bien! Sigue practicando':'Escucha e intenta de nuevo';
+    const res = document.getElementById('modal-pronun-result');
+    res.style.display = 'block';
+    res.innerHTML = `
+      <div class="pronun-result show">
+        <div class="score-row">
+          <div class="score-circle ${cls}">${total}%</div>
+          <div class="score-msg"><strong>${emoji} ${msg}</strong>
+            <div class="word-scores" style="margin-top:8px">
+              ${results.map(r=>`<span class="ws ${r.score>=80?'great':r.score>=50?'good':'bad'}">${r.word} ${r.score}%</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    if(btn) { btn.textContent = '🎤 Intentar de nuevo'; btn.classList.remove('recording'); }
+    modalRecording = false;
+  };
+
+  rec.onerror = () => {
+    clearInterval(window._modalKarIv);
+    if(btn) { btn.textContent = '🎤 Pronunciar'; btn.classList.remove('recording'); }
+    modalRecording = false;
+    toast('No te escuché. Intenta de nuevo.', true);
+  };
+  rec.onend = () => {
+    clearInterval(window._modalKarIv);
+    if(btn && btn.textContent === '🔴 Escuchando...') btn.textContent = '🎤 Pronunciar';
+    btn && btn.classList.remove('recording');
+    modalRecording = false;
+  };
+  rec.start();
+}
+
+function closeModal() {
+  document.getElementById('practice-modal').classList.remove('show');
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  clearInterval(window._modalKarIv);
+  modalRecording = false;
+}
+
+function exportPhrases() {
+  if (myPhrases.length === 0) { toast('No tienes frases para exportar', true); return; }
+  const blob = new Blob([JSON.stringify(myPhrases, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `speakpro-mis-frases-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast(`Exportadas ${myPhrases.length} frases ⬇️`, false);
+}
+
+function importPhrases(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) throw new Error();
+      const validPhrases = imported.filter(p => p.en && p.es && p.pron);
+      const existing = new Set(myPhrases.map(p => p.en.toLowerCase()));
+      const newOnes = validPhrases.filter(p => !existing.has(p.en.toLowerCase()));
+      myPhrases = [...newOnes, ...myPhrases];
+      saveToStorage();
+      renderMyPhrases();
+      toast(`Importadas ${newOnes.length} frases nuevas ✅`, false);
+    } catch {
+      toast('Archivo inválido. Usa un JSON exportado de SpeakPro.', true);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// Modal overlay click handled in init
+
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if(e.key==='ArrowRight') markKnown();
+  else if(e.key==='ArrowLeft') markHard();
+  else if(e.key===' ') { e.preventDefault(); speakPhrase(); }
+  else if(e.key==='ArrowDown') prevCard();
+  else if(e.key==='m'||e.key==='M') toggleMic();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+// Safe init - runs after all DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    filterPhrases();
+    renderCats();
+    renderCard();
+    renderSituations();
+    populateCatSelect();
+    renderMyPhrases();
+    var overlay = document.getElementById('practice-modal');
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  });
+} else {
+  filterPhrases();
+  renderCats();
+  renderCard();
+  renderSituations();
+  populateCatSelect();
+  renderMyPhrases();
+  var overlay = document.getElementById('practice-modal');
+  if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+}
+</script>
+
+<!-- ===================== MY PHRASES PAGE ===================== -->
+<div class="page" id="page-myphrases">
+  <div class="container">
+
+    <div class="mp-hero">
+      <div class="mp-hero-icon">✨</div>
+      <div>
+        <h2>Mis Frases Personales</h2>
+        <p>Escribe cualquier frase en inglés y la IA la completa automáticamente con pronunciación, traducción, truco de memoria y ejemplos. Se guarda en tu dispositivo.</p>
+      </div>
+    </div>
+
+    <!-- ADD CARD -->
+    <div class="add-card">
+      <h3>🤖 Añadir nueva frase con IA</h3>
+      <div class="ai-input-wrap">
+        <input class="ai-input" id="ai-phrase-input" placeholder="Escribe la frase en inglés... ej: It's a long shot" onkeydown="if(event.key==='Enter')generatePhrase(); event.stopPropagation();" onkeyup="event.stopPropagation();" />
+        <span class="ai-input-icon">⚡</span>
+      </div>
+
+      <div class="ai-generating" id="ai-generating">
+        <div class="ai-spin"></div>
+        <span id="ai-gen-text">La IA está completando tu frase...</span>
+      </div>
+
+      <div class="preview-card" id="preview-card">
+        <div class="preview-en" id="prev-en"></div>
+        <div class="preview-pron" id="prev-pron"></div>
+        <div class="preview-es" id="prev-es"></div>
+        <div class="preview-tip" id="prev-tip"></div>
+        <div class="ex-title">Ejemplos:</div>
+        <div class="preview-exs" id="prev-exs"></div>
+      </div>
+
+      <select class="cat-select" id="new-phrase-cat">
+        <option value="⭐ Mis Frases">⭐ Mis Frases (categoría por defecto)</option>
+      </select>
+
+      <div style="display:flex;gap:10px">
+        <button class="btn" style="flex:0;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:13px 18px;border-radius:13px;font-family:Outfit,sans-serif;font-size:14px;font-weight:600;cursor:pointer" onclick="generatePhrase()">⚡ Generar con IA</button>
+        <button class="btn-add-confirm" id="btn-save-phrase" onclick="savePhrase()" disabled>💾 Guardar frase</button>
+      </div>
+    </div>
+
+    <!-- LIST TOOLBAR -->
+    <div class="mp-toolbar">
+      <div class="mp-count">Tienes <strong id="mp-count-num">0</strong> frases personales</div>
+      <button class="btn-export" onclick="exportPhrases()">⬇️ Exportar</button>
+      <label class="btn-import-label">⬆️ Importar<input type="file" accept=".json" style="display:none" onchange="importPhrases(event)"></label>
+    </div>
+
+    <div class="mp-filter-btns" id="mp-filters"></div>
+
+    <div id="mp-list"></div>
+
+  </div>
+</div>
+
+<!-- PRACTICE MODAL -->
+<div class="modal-overlay" id="practice-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+</body>
+</html>
