@@ -301,9 +301,75 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .modal-close{position:absolute;top:16px;right:16px;background:var(--card2);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .modal-close:hover{color:var(--text);background:var(--border)}
 
+
+/* =================== AUTH SCREEN =================== */
+.auth-overlay{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-overlay.hidden{display:none}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:40px 36px;max-width:420px;width:100%;text-align:center;position:relative}
+.auth-box::before{content:'';position:absolute;inset:0;border-radius:28px;background:radial-gradient(ellipse at top,rgba(108,99,255,.08),transparent 60%);pointer-events:none}
+.auth-logo{font-size:52px;margin-bottom:8px}
+.auth-title{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.auth-subtitle{color:var(--muted);font-size:14px;margin-bottom:32px;line-height:1.5}
+.auth-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:14px 18px;color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;outline:none;transition:border-color .2s;margin-bottom:12px;text-align:left}
+.auth-input:focus{border-color:var(--accent)}
+.auth-input::placeholder{color:var(--muted)}
+.btn-magic{width:100%;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;padding:15px;border-radius:13px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:14px}
+.btn-magic:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,99,255,.4)}
+.btn-magic:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:14px;color:var(--muted);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn-google{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:13px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-google:hover{border-color:var(--accent);transform:translateY(-2px)}
+.auth-msg{font-size:13px;margin-top:14px;padding:12px;border-radius:10px;display:none}
+.auth-msg.show{display:block}
+.auth-msg.success{background:rgba(0,245,160,.1);color:var(--green);border:1px solid rgba(0,245,160,.2)}
+.auth-msg.error{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)}
+.auth-msg.info{background:rgba(108,99,255,.1);color:var(--accent);border:1px solid rgba(108,99,255,.2)}
+.auth-loading{display:none;flex-direction:column;align-items:center;gap:14px}
+.auth-loading.show{display:flex}
+.auth-spin-big{width:48px;height:48px;border:3px solid rgba(108,99,255,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.auth-loading p{color:var(--muted);font-size:14px}
+
+/* USER HEADER */
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:100px;padding:5px 12px 5px 5px;cursor:pointer;transition:all .2s}
+.user-pill:hover{border-color:var(--accent)}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-menu{position:absolute;top:60px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:8px;min-width:180px;z-index:200;display:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.user-menu.show{display:block}
+.user-menu-item{padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:8px}
+.user-menu-item:hover{background:var(--card2)}
+.user-menu-item.danger{color:var(--red)}
+.sync-indicator{font-size:10px;color:var(--green);display:flex;align-items:center;gap:4px}
+.sync-indicator.syncing{color:var(--muted)}
+
 </style>
 </head>
 <body>
+
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div id="auth-form-section">
+      <div class="auth-logo">⚡</div>
+      <div class="auth-title">SpeakPro</div>
+      <div class="auth-subtitle">Tu app privada para aprender inglés.<br>Solo usuarios invitados.</div>
+      <input class="auth-input" id="auth-email" type="email" placeholder="Tu email..." />
+      <button class="btn-magic" id="btn-magic" onclick="if(typeof sendMagicLink!=='undefined')sendMagicLink()">✨ Entrar con Magic Link</button>
+      <div class="auth-divider">o</div>
+      <button class="btn-google" onclick="if(typeof loginWithGoogle!=='undefined')loginWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+      <div class="auth-msg" id="auth-msg"></div>
+    </div>
+    <div class="auth-loading" id="auth-loading">
+      <div class="auth-spin-big"></div>
+      <p id="auth-loading-text">Verificando acceso...</p>
+    </div>
+  </div>
+</div>
 
 <nav class="nav">
   <div class="nav-inner">
@@ -312,6 +378,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button class="nav-tab active" onclick="showPage('flashcards')">🃏 <span>Frases</span></button>
       <button class="nav-tab" onclick="showPage('dialogue')">🗣️ <span>Diálogos</span></button>
       <button class="nav-tab" onclick="showPage('myphrases')">✨ <span>Mis Frases</span></button>
+    </div>
+    <div style="position:relative">
+      <div class="user-pill" id="user-pill" onclick="toggleUserMenu()" style="display:none">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-name" id="user-name">Usuario</div>
+      </div>
+      <div class="user-menu" id="user-menu">
+        <div class="user-menu-item">📧 <span id="menu-email"></span></div>
+        <div class="user-menu-item sync-indicator" id="sync-status">☁️ Sincronizado</div>
+        <div class="user-menu-item danger" onclick="signOut()">🚪 Cerrar sesión</div>
+      </div>
     </div>
   </div>
 </nav>
@@ -434,7 +511,290 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+const SUPABASE_URL = 'https://nutbkatyuootkgdafksq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51dGJrYXR5dW9vdGtnZGFma3NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTMxOTIsImV4cCI6MjA4OTg2OTE5Mn0.fXgKi3p-Jorb2Z1j6rUuOTpl7Yzm9CYrfLT-3Q7A8cM';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser = null;
+
+// ============================================================
+// AUTH FUNCTIONS
+// ============================================================
+async function initAuth() {
+  // Check for magic link token in URL
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    await handleUserSession(session.user);
+  } else {
+    showAuthOverlay();
+  }
+
+  // Listen for auth changes
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await handleUserSession(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      showAuthOverlay();
+    }
+  });
+}
+
+async function handleUserSession(user) {
+  showLoading('Verificando acceso...');
+  
+  // Check if user is invited
+  const { data: invite } = await supabase
+    .from('invited_users')
+    .select('email')
+    .eq('email', user.email)
+    .single();
+
+  if (!invite) {
+    await sb.auth.signOut();
+    showAuthOverlay();
+    showAuthMsg('❌ No tienes acceso. Pide una invitación.', 'error');
+    return;
+  }
+
+  currentUser = user;
+  hideAuthOverlay();
+  updateUserUI(user);
+  await loadUserData();
+}
+
+async function sendMagicLink() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { showAuthMsg('Escribe tu email primero', 'error'); return; }
+  
+  const btn = document.getElementById('btn-magic');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  // Check if invited first
+  const { data: invite } = await supabase
+    .from('invited_users')
+    .select('email')
+    .eq('email', email)
+    .single();
+
+  if (!invite) {
+    showAuthMsg('❌ Este email no tiene acceso. Pide una invitación.', 'error');
+    btn.disabled = false;
+    btn.textContent = '✨ Entrar con Magic Link';
+    return;
+  }
+
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+
+  if (error) {
+    showAuthMsg('Error al enviar. Intenta de nuevo.', 'error');
+  } else {
+    showAuthMsg('✅ ¡Revisa tu email! Te enviamos un link para entrar.', 'success');
+  }
+  btn.disabled = false;
+  btn.textContent = '✨ Entrar con Magic Link';
+}
+
+async function loginWithGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if (error) showAuthMsg('Error con Google. Intenta con Magic Link.', 'error');
+}
+
+async function signOut() {
+  toggleUserMenu();
+  await sb.auth.signOut();
+  currentUser = null;
+  // Reset local state
+  learned = new Set();
+  hardList = [];
+  streak = 0;
+  myPhrases = [];
+  showAuthOverlay();
+}
+
+function showAuthOverlay() {
+  document.getElementById('auth-overlay').classList.remove('hidden');
+  document.getElementById('auth-loading').classList.remove('show');
+  document.getElementById('auth-form-section').style.display = 'block';
+  document.getElementById('user-pill').style.display = 'none';
+}
+
+function hideAuthOverlay() {
+  document.getElementById('auth-overlay').classList.add('hidden');
+  document.getElementById('user-pill').style.display = 'flex';
+}
+
+function showLoading(text) {
+  document.getElementById('auth-form-section').style.display = 'none';
+  document.getElementById('auth-loading').classList.add('show');
+  document.getElementById('auth-loading-text').textContent = text;
+}
+
+function showAuthMsg(msg, type) {
+  const el = document.getElementById('auth-msg');
+  el.textContent = msg;
+  el.className = 'auth-msg show ' + type;
+}
+
+function updateUserUI(user) {
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const avatar = name.charAt(0).toUpperCase();
+  document.getElementById('user-avatar').textContent = avatar;
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('menu-email').textContent = user.email;
+}
+
+function toggleUserMenu() {
+  document.getElementById('user-menu').classList.toggle('show');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#user-pill') && !e.target.closest('#user-menu')) {
+    document.getElementById('user-menu')?.classList.remove('show');
+  }
+});
+
+// ============================================================
+// SUPABASE DATA SYNC
+// ============================================================
+function setSyncStatus(syncing) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  if (syncing) {
+    el.innerHTML = '🔄 Sincronizando...';
+    el.className = 'user-menu-item sync-indicator syncing';
+  } else {
+    el.innerHTML = '☁️ Sincronizado';
+    el.className = 'user-menu-item sync-indicator';
+  }
+}
+
+async function loadUserData() {
+  if (!currentUser) return;
+  setSyncStatus(true);
+  try {
+    // Load progress (learned + review)
+    const { data: progressData } = await supabase
+      .from('progress')
+      .select('*')
+      .eq('user_id', currentUser.id);
+
+    if (progressData) {
+      learned = new Set(progressData.filter(p => p.status === 'learned').map(p => p.phrase_en));
+      hardList = progressData
+        .filter(p => p.status === 'review')
+        .map(p => phrases.find(ph => ph.en === p.phrase_en))
+        .filter(Boolean);
+    }
+
+    // Load my phrases
+    const { data: myPhrasesData } = await supabase
+      .from('my_phrases')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if (myPhrasesData) {
+      myPhrases = myPhrasesData.map(p => ({
+        ...p,
+        examples: p.examples || [],
+        isCustom: true
+      }));
+    }
+
+    // Load stats
+    const { data: statsData } = await supabase
+      .from('stats')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .single();
+
+    if (statsData) {
+      streak = statsData.streak || 0;
+      // Check if streak should reset (last study wasn't yesterday or today)
+      if (statsData.last_study_date) {
+        const last = new Date(statsData.last_study_date);
+        const today = new Date();
+        const diffDays = Math.floor((today - last) / (1000*60*60*24));
+        if (diffDays > 1) streak = 0;
+      }
+    }
+
+    setSyncStatus(false);
+    filterPhrases();
+    renderCats();
+    renderCard();
+    renderMyPhrases();
+    updateStats();
+
+  } catch(err) {
+    console.error('Load error:', err);
+    setSyncStatus(false);
+  }
+}
+
+async function saveProgress(phraseEn, status, score) {
+  if (!currentUser) return;
+  setSyncStatus(true);
+  try {
+    await sb.from('progress').upsert({
+      user_id: currentUser.id,
+      phrase_en: phraseEn,
+      status: status,
+      score: score || 0,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id,phrase_en' });
+    setSyncStatus(false);
+  } catch(err) { console.error('Save progress error:', err); setSyncStatus(false); }
+}
+
+async function saveStats() {
+  if (!currentUser) return;
+  try {
+    await sb.from('stats').upsert({
+      user_id: currentUser.id,
+      streak: streak,
+      last_study_date: new Date().toISOString().split('T')[0],
+      total_learned: learned.size,
+      total_reviewed: hardList.length,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+  } catch(err) { console.error('Save stats error:', err); }
+}
+
+async function saveMyPhraseToDB(phrase) {
+  if (!currentUser) return null;
+  try {
+    const { data, error } = await sb.from('my_phrases').insert({
+      user_id: currentUser.id,
+      phrase_en: phrase.en,
+      pron: phrase.pron,
+      es: phrase.es,
+      tip: phrase.tip,
+      examples: phrase.examples,
+      category: phrase.category
+    }).select().single();
+    return data;
+  } catch(err) { console.error('Save phrase error:', err); return null; }
+}
+
+async function deleteMyPhraseFromDB(id) {
+  if (!currentUser) return;
+  try {
+    await sb.from('my_phrases').delete().eq('id', id).eq('user_id', currentUser.id);
+  } catch(err) { console.error('Delete phrase error:', err); }
+}
+
+
 // ============================================================
 // DATA
 // ============================================================
@@ -996,14 +1356,20 @@ function prevCard() { if(!filtered.length) return; currentIdx = (currentIdx-1+fi
 
 function markKnown() {
   if(!filtered.length) return;
-  learned.add(filtered[currentIdx].en); streak++;
+  const phrase = filtered[currentIdx];
+  learned.add(phrase.en); streak++;
+  saveProgress(phrase.en, 'learned', 0);
+  saveStats();
   toast('¡Genial! 🔥 Racha: '+streak, false); nextCard();
 }
 function markHard() {
   if(!filtered.length) return;
   const p = filtered[currentIdx];
   if(!hardList.find(x=>x.en===p.en)) hardList.push(p);
-  streak = 0; toast('La revisamos luego 📚', true); nextCard();
+  saveProgress(p.en, 'review', 0);
+  streak = 0;
+  saveStats();
+  toast('La revisamos luego 📚', true); nextCard();
 }
 
 function speakPhrase() {
@@ -1502,12 +1868,25 @@ Solo responde con el JSON, nada más.`
   }
 }
 
-function savePhrase() {
+async function savePhrase() {
   if (!pendingPhrase) return;
   const cat = document.getElementById('new-phrase-cat').value;
-  const newPhrase = { ...pendingPhrase, category: cat, id: Date.now(), isCustom: true };
-  myPhrases.unshift(newPhrase);
-  saveToStorage();
+  
+  // Save to Supabase if logged in
+  if (currentUser) {
+    const saved = await saveMyPhraseToDB({ ...pendingPhrase, category: cat });
+    if (saved) {
+      myPhrases.unshift({ ...saved, examples: saved.examples || [], isCustom: true });
+    } else {
+      const newPhrase = { ...pendingPhrase, category: cat, id: Date.now(), isCustom: true };
+      myPhrases.unshift(newPhrase);
+      saveToStorage();
+    }
+  } else {
+    const newPhrase = { ...pendingPhrase, category: cat, id: Date.now(), isCustom: true };
+    myPhrases.unshift(newPhrase);
+    saveToStorage();
+  }
 
   // Reset form
   document.getElementById('ai-phrase-input').value = '';
@@ -1519,9 +1898,10 @@ function savePhrase() {
   toast('¡Frase guardada! ✅', false);
 }
 
-function deletePhrase(id) {
+async function deletePhrase(id) {
   myPhrases = myPhrases.filter(p => p.id !== id);
   saveToStorage();
+  if (currentUser) await deleteMyPhraseFromDB(id);
   renderMyPhrases();
   toast('Frase eliminada', true);
 }
@@ -1755,18 +2135,7 @@ document.addEventListener('keydown', e => {
 // INIT
 // ============================================================
 // Safe init - runs after all DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() {
-    filterPhrases();
-    renderCats();
-    renderCard();
-    renderSituations();
-    populateCatSelect();
-    renderMyPhrases();
-    var overlay = document.getElementById('practice-modal');
-    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-  });
-} else {
+function appInit() {
   filterPhrases();
   renderCats();
   renderCard();
@@ -1775,6 +2144,14 @@ if (document.readyState === 'loading') {
   renderMyPhrases();
   var overlay = document.getElementById('practice-modal');
   if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  // Init Supabase auth
+  initAuth();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', appInit);
+} else {
+  appInit();
 }
 </script>
 
