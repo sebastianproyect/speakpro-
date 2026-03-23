@@ -546,24 +546,45 @@ async function initAuth() {
 async function handleUserSession(user) {
   showLoading('Verificando acceso...');
   
-  // Check if user is invited
-  const { data: invite } = await supabase
-    .from('invited_users')
-    .select('email')
-    .eq('email', user.email)
-    .single();
+  try {
+    // Check if user is invited
+    const { data: invite, error } = await sb
+      .from('invited_users')
+      .select('email')
+      .eq('email', user.email)
+      .maybeSingle();
 
-  if (!invite) {
-    await sb.auth.signOut();
-    showAuthOverlay();
-    showAuthMsg('❌ No tienes acceso. Pide una invitación.', 'error');
-    return;
+    if (error) {
+      console.error('Invite check error:', error);
+      // If table error, allow access (fail open for now)
+      currentUser = user;
+      hideAuthOverlay();
+      updateUserUI(user);
+      await loadUserData();
+      return;
+    }
+
+    if (!invite) {
+      await sb.auth.signOut();
+      showAuthOverlay();
+      showAuthMsg('❌ No tienes acceso. Pide una invitación.', 'error');
+      return;
+    }
+
+    currentUser = user;
+    hideAuthOverlay();
+    updateUserUI(user);
+    await loadUserData();
+
+  } catch(err) {
+    console.error('Session error:', err);
+    // On any error, still show the app
+    currentUser = user;
+    hideAuthOverlay();
+    updateUserUI(user);
+    renderCard();
+    renderMyPhrases();
   }
-
-  currentUser = user;
-  hideAuthOverlay();
-  updateUserUI(user);
-  await loadUserData();
 }
 
 async function sendMagicLink() {
@@ -575,7 +596,7 @@ async function sendMagicLink() {
   btn.textContent = 'Enviando...';
 
   // Check if invited first
-  const { data: invite } = await supabase
+  const { data: invite } = await sb
     .from('invited_users')
     .select('email')
     .eq('email', email)
@@ -681,9 +702,20 @@ function setSyncStatus(syncing) {
 async function loadUserData() {
   if (!currentUser) return;
   setSyncStatus(true);
+  
+  // Set a timeout so UI never hangs
+  const timeout = setTimeout(() => {
+    setSyncStatus(false);
+    filterPhrases();
+    renderCats();
+    renderCard();
+    renderMyPhrases();
+    updateStats();
+  }, 5000);
+
   try {
     // Load progress (learned + review)
-    const { data: progressData } = await supabase
+    const { data: progressData } = await sb
       .from('progress')
       .select('*')
       .eq('user_id', currentUser.id);
@@ -697,7 +729,7 @@ async function loadUserData() {
     }
 
     // Load my phrases
-    const { data: myPhrasesData } = await supabase
+    const { data: myPhrasesData } = await sb
       .from('my_phrases')
       .select('*')
       .eq('user_id', currentUser.id)
@@ -712,7 +744,7 @@ async function loadUserData() {
     }
 
     // Load stats
-    const { data: statsData } = await supabase
+    const { data: statsData } = await sb
       .from('stats')
       .select('*')
       .eq('user_id', currentUser.id)
@@ -729,6 +761,7 @@ async function loadUserData() {
       }
     }
 
+    clearTimeout(timeout);
     setSyncStatus(false);
     filterPhrases();
     renderCats();
@@ -737,8 +770,13 @@ async function loadUserData() {
     updateStats();
 
   } catch(err) {
+    clearTimeout(timeout);
     console.error('Load error:', err);
     setSyncStatus(false);
+    filterPhrases();
+    renderCats();
+    renderCard();
+    renderMyPhrases();
   }
 }
 
