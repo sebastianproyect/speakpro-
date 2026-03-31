@@ -138,6 +138,67 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .fc-answer{display:none}
 .fc-answer.revealed{display:block}
 
+/* TYPING MODE */
+.typing-wrap{margin-bottom:16px}
+.typing-input{width:100%;background:var(--card2);border:2px solid var(--border);border-radius:14px;padding:14px 18px;color:var(--text);font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;outline:none;transition:border-color .2s;margin-bottom:8px}
+.typing-input:focus{border-color:var(--accent)}
+.typing-input::placeholder{color:var(--muted);font-weight:400}
+.btn-check{width:100%;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;padding:12px;border-radius:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-check:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(108,99,255,.4)}
+.typing-result{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.typing-result-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.diff-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.diff-w{padding:4px 10px;border-radius:8px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:5px}
+.diff-ok{background:rgba(0,245,160,.15);color:var(--green)}
+.diff-bad{background:rgba(255,71,87,.12);color:var(--red)}
+.diff-close{background:rgba(255,214,10,.1);color:var(--yellow)}
+.diff-correct-hint{font-size:11px;opacity:.8;font-style:italic}
+.typing-score{font-size:28px;font-weight:800;text-align:center;margin-bottom:8px}
+.typing-msg{font-size:13px;color:var(--muted);text-align:center;margin-bottom:12px}
+
+/* SPEED CONTROL */
+.speed-control{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.speed-lbl{font-size:11px;color:var(--muted);font-weight:600}
+.speed-btns{display:flex;gap:4px}
+.spd-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:8px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+.spd-btn:hover{border-color:var(--accent);color:var(--accent)}
+.spd-btn.on{background:rgba(108,99,255,.15);border-color:var(--accent);color:var(--accent)}
+
+/* ACTIVITY CALENDAR */
+.activity-grid{display:flex;flex-wrap:wrap;gap:3px}
+.act-cell{width:16px;height:16px;border-radius:3px;cursor:default;transition:transform .15s}
+.act-cell:hover{transform:scale(1.4);z-index:1}
+.act-0{background:var(--card2);border:1px solid var(--border)}
+.act-1{background:rgba(108,99,255,.3)}
+.act-2{background:rgba(108,99,255,.55)}
+.act-3{background:rgba(108,99,255,.8)}
+.act-4{background:var(--accent);box-shadow:0 0 6px rgba(108,99,255,.5)}
+.act-legend{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)}
+.act-legend-cells{display:flex;gap:3px}
+
+/* WEAK PHRASES */
+.weak-card{background:var(--card);border:1px solid rgba(255,71,87,.2);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s}
+.weak-card:hover{border-color:rgba(255,71,87,.4)}
+.weak-en{font-size:14px;font-weight:700;flex:1}
+.weak-es{font-size:12px;color:var(--muted);flex:1}
+.weak-badge{background:rgba(255,71,87,.15);color:var(--red);border-radius:100px;font-size:10px;font-weight:800;padding:3px 10px;white-space:nowrap;flex-shrink:0}
+.weak-empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+
+/* TEXT EXTRACTOR */
+.extractor-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+.extractor-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.extractor-sub{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.extractor-textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;resize:vertical;min-height:90px;transition:border-color .2s;margin-bottom:10px}
+.extractor-textarea:focus{border-color:var(--accent)}
+.extracted-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;margin-bottom:12px;scrollbar-width:none}
+.extracted-list::-webkit-scrollbar{display:none}
+.extracted-item{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .2s}
+.extracted-item.selected{background:rgba(108,99,255,.1);border-color:var(--accent)}
+.extracted-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s}
+.extracted-item.selected .extracted-check{background:var(--accent);border-color:var(--accent);color:#fff}
+.extracted-en{font-size:13px;font-weight:700;flex:1}
+.extracted-known{font-size:10px;color:var(--green);font-weight:700}
+
 /* COLLAPSIBLE SECTIONS */
 .collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:13px 16px;background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:8px;transition:border-color .2s;user-select:none}
 .collapsible-header:hover{border-color:rgba(108,99,255,.3)}
@@ -533,7 +594,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn-fast" id="btn-fast" onclick="toggleFastMode()" title="Modo rápido: muestra la respuesta automáticamente">⚡</button>
+        <button class="btn-fast" id="btn-typing" onclick="toggleTypingMode()" title="Modo escritura: escribe la traducción">⌨️</button>
+        <button class="btn-fast" id="btn-fast" onclick="toggleFastMode()" title="Modo rápido: respuesta automática">⚡</button>
         <button class="btn-explore" id="btn-explore" onclick="toggleExploreMode()">Explorar</button>
       </div>
     </div>
@@ -599,10 +661,23 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
       <div class="fc-pron" id="fc-pron">🔊 ...</div>
 
-      <!-- ANKI RECALL COVER -->
+      <!-- ANKI RECALL COVER (normal mode) -->
       <div class="recall-cover" id="recall-cover">
         <div class="recall-hint">Lee la frase en inglés — ¿la sabes? Luego revela la traducción</div>
         <button class="btn-reveal" onclick="revealAnswer()">👁 Ver traducción</button>
+      </div>
+
+      <!-- TYPING MODE INPUT -->
+      <div class="typing-wrap" id="typing-wrap" style="display:none">
+        <div class="recall-hint" style="text-align:center;margin-bottom:10px">⌨️ Escribe la traducción en español</div>
+        <input class="typing-input" id="typing-input" placeholder="Escribe aquí la traducción..." onkeydown="if(event.key==='Enter'){event.preventDefault();checkTyping()}" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="btn-check" onclick="checkTyping()">✓ Verificar respuesta</button>
+      </div>
+      <div class="typing-result" id="typing-result" style="display:none">
+        <div class="typing-score" id="typing-score"></div>
+        <div class="typing-msg" id="typing-msg"></div>
+        <div class="typing-result-lbl">Tu respuesta vs. la correcta:</div>
+        <div class="diff-row" id="typing-diff"></div>
       </div>
 
       <!-- ANSWER (hidden until revealed) -->
@@ -640,6 +715,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <button class="btn btn-speak" onclick="speakPhrase()" title="Escuchar">🔊</button>
         <button class="btn btn-mic" id="mic-btn" onclick="toggleMic()" title="Pronunciar">🎤</button>
       </div>
+      <div class="speed-control">
+        <span class="speed-lbl">Velocidad:</span>
+        <div class="speed-btns">
+          <button class="spd-btn" id="spd-05" onclick="setSpeed(0.5)">0.5×</button>
+          <button class="spd-btn" id="spd-075" onclick="setSpeed(0.75)">0.75×</button>
+          <button class="spd-btn on" id="spd-1" onclick="setSpeed(1)">1×</button>
+          <button class="spd-btn" id="spd-13" onclick="setSpeed(1.3)">1.3×</button>
+        </div>
+      </div>
       <div class="mic-hint" id="mic-hint">Toca 🎤 para practicar tu pronunciación con karaoke</div>
     </div>
 
@@ -661,6 +745,37 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
         <div class="dash-projection" id="dash-projection">Empieza a calificar frases para ver tu proyección de aprendizaje.</div>
       </div>
+    </div>
+
+    <!-- ACTIVITY CALENDAR (collapsible) -->
+    <div class="collapsible-header" onclick="toggleCollapsible('act-body','act-arrow')">
+      <div class="collapsible-header-left">🗓️ Actividad — últimos 30 días</div>
+      <span class="collapsible-arrow" id="act-arrow">▼</span>
+    </div>
+    <div class="collapsible-body" id="act-body">
+      <div class="sm2-dash" style="margin-top:0">
+        <div class="activity-grid" id="activity-grid"></div>
+        <div class="act-legend">
+          <span>Menos</span>
+          <div class="act-legend-cells">
+            <div class="act-cell act-0" style="width:14px;height:14px"></div>
+            <div class="act-cell act-1" style="width:14px;height:14px"></div>
+            <div class="act-cell act-2" style="width:14px;height:14px"></div>
+            <div class="act-cell act-3" style="width:14px;height:14px"></div>
+            <div class="act-cell act-4" style="width:14px;height:14px"></div>
+          </div>
+          <span>Más</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEAK PHRASES (collapsible) -->
+    <div class="collapsible-header" onclick="toggleCollapsible('weak-body','weak-arrow')">
+      <div class="collapsible-header-left">🔴 Mis puntos débiles</div>
+      <span class="collapsible-arrow" id="weak-arrow">▼</span>
+    </div>
+    <div class="collapsible-body" id="weak-body">
+      <div id="weak-list"></div>
     </div>
 
   </div>
@@ -1735,11 +1850,20 @@ function rateSM2(quality) {
   sessionDoneToday.add(phrase.en);
   saveSessionToday();
 
-  // Streak: solo incrementa en >= 3, nunca se rompe por dificultad
-  if (quality >= 3) {
-    learned.add(phrase.en);
-    streak++;
+  // Racha y aprendidas
+  if (quality >= 3) { learned.add(phrase.en); streak++; }
+
+  // Contador de errores ("Otra vez") para puntos débiles
+  if (quality === 1) {
+    againCounts[phrase.en] = (againCounts[phrase.en] || 0) + 1;
+    saveAgainCounts();
   }
+
+  // Actividad del día
+  const todayKey = getLocalDateStr();
+  activityData[todayKey] = (activityData[todayKey] || 0) + 1;
+  saveActivityData();
+
   saveProgress(phrase.en, quality >= 4 ? 'learned' : 'review', quality * 20);
   saveStats();
 
@@ -1840,6 +1964,10 @@ let currentSituation = null;
 let isChatRecording = false;
 let exploreMode = false;
 let fastMode = false;
+let typingMode = false;
+let speechRate = 1.0;
+let againCounts = {};   // phraseEn → nº de veces calificada "Otra vez"
+let activityData = {};  // "YYYY-MM-DD" → nº de cartas estudiadas
 let sessionDoneToday = new Set(); // frases completadas en la sesión de hoy
 
 // ============================================================
@@ -1888,9 +2016,219 @@ function toggleExploreMode() {
 
 function toggleFastMode() {
   fastMode = !fastMode;
+  if (fastMode && typingMode) { typingMode = false; document.getElementById('btn-typing')?.classList.remove('on'); }
   const btn = document.getElementById('btn-fast');
   if (btn) btn.classList.toggle('on', fastMode);
-  toast(fastMode ? '⚡ Modo rápido ON — respuesta automática' : '⚡ Modo rápido OFF', false);
+  toast(fastMode ? '⚡ Modo rápido ON' : '⚡ Modo rápido OFF', false);
+  renderCard();
+}
+
+// ============================================================
+// TYPING MODE
+// ============================================================
+function toggleTypingMode() {
+  typingMode = !typingMode;
+  if (typingMode && fastMode) { fastMode = false; document.getElementById('btn-fast')?.classList.remove('on'); }
+  const btn = document.getElementById('btn-typing');
+  if (btn) btn.classList.toggle('on', typingMode);
+  toast(typingMode ? '⌨️ Modo escritura ON' : '⌨️ Modo escritura OFF', false);
+  renderCard();
+}
+
+function checkTyping() {
+  if (!filtered.length) return;
+  const input = document.getElementById('typing-input');
+  const typed = (input?.value || '').trim();
+  if (!typed) { toast('Escribe algo primero', true); return; }
+
+  const p = filtered[currentIdx];
+  const correct = p.es.replace(/[<>]/g, ''); // strip html if any
+
+  // Normalize: lowercase, no accents for comparison
+  function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿¡.,!?;:]/g,'').trim(); }
+
+  const typedWords = norm(typed).split(/\s+/);
+  const correctWords = norm(correct).split(/\s+/);
+  const correctDisplay = correct.split(/\s+/);
+
+  let matchCount = 0;
+  const diffHtml = correctDisplay.map((word, i) => {
+    const tw = typedWords[i] || '';
+    const cw = norm(word);
+    if (tw === cw) {
+      matchCount++;
+      return `<span class="diff-w diff-ok">✓ ${word}</span>`;
+    } else {
+      // Check similarity (close match)
+      const sim = tw.length > 0 ? [...tw].filter((c,j) => c === (cw[j]||'')).length / Math.max(tw.length, cw.length) : 0;
+      if (sim >= 0.6) {
+        matchCount += 0.5;
+        return `<span class="diff-w diff-close">${tw} <span class="diff-correct-hint">→ ${word}</span></span>`;
+      }
+      return `<span class="diff-w diff-bad">${tw||'_'} <span class="diff-correct-hint">→ ${word}</span></span>`;
+    }
+  }).join('');
+
+  const pct = Math.round((matchCount / correctWords.length) * 100);
+  const emoji = pct >= 90 ? '🎯' : pct >= 60 ? '🟡' : '🔴';
+  const msg = pct >= 90 ? '¡Excelente! Lo sabes perfecto.' : pct >= 60 ? 'Casi. Revisa las palabras marcadas.' : 'Sigue practicando — revisa la frase.';
+
+  document.getElementById('typing-score').textContent = `${emoji} ${pct}%`;
+  document.getElementById('typing-msg').textContent = msg;
+  document.getElementById('typing-diff').innerHTML = diffHtml;
+  document.getElementById('typing-result').style.display = 'block';
+
+  // Auto-reveal SM-2 buttons with suggested quality
+  const answerEl = document.getElementById('fc-answer');
+  if (answerEl) answerEl.classList.add('revealed');
+  document.getElementById('typing-wrap').style.display = 'none';
+
+  // Pre-select suggested SM-2 quality based on score
+  const q = pct >= 90 ? 5 : pct >= 70 ? 4 : pct >= 45 ? 3 : 1;
+  const labels = {1:'sm2-again',3:'sm2-hard',4:'sm2-good',5:'sm2-easy'};
+  document.querySelectorAll('.sm2-btn').forEach(b => b.style.outline = 'none');
+  const suggested = document.querySelector(`.${labels[q]}`);
+  if (suggested) suggested.style.outline = '2px solid var(--accent)';
+
+  if (input) input.value = '';
+}
+
+// ============================================================
+// SPEED CONTROL
+// ============================================================
+function setSpeed(rate) {
+  speechRate = rate;
+  ['spd-05','spd-075','spd-1','spd-13'].forEach(id => document.getElementById(id)?.classList.remove('on'));
+  const map = {0.5:'spd-05', 0.75:'spd-075', 1:'spd-1', 1.3:'spd-13'};
+  document.getElementById(map[rate])?.classList.add('on');
+}
+
+// ============================================================
+// ACTIVITY CALENDAR
+// ============================================================
+function loadActivityData() {
+  try { activityData = JSON.parse(localStorage.getItem('sp_activity') || '{}'); } catch(e) { activityData = {}; }
+}
+function saveActivityData() {
+  localStorage.setItem('sp_activity', JSON.stringify(activityData));
+}
+function renderActivityCalendar() {
+  const grid = document.getElementById('activity-grid');
+  if (!grid) return;
+  const today = new Date();
+  let html = '';
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = getLocalDateStr(d);
+    const count = activityData[key] || 0;
+    const level = count === 0 ? 0 : count <= 3 ? 1 : count <= 7 ? 2 : count <= 14 ? 3 : 4;
+    const label = i === 0 ? 'Hoy' : `${d.getDate()}/${d.getMonth()+1}`;
+    html += `<div class="act-cell act-${level}" title="${label}: ${count} carta${count!==1?'s':''}"></div>`;
+  }
+  grid.innerHTML = html;
+}
+
+// ============================================================
+// WEAK PHRASES
+// ============================================================
+function loadAgainCounts() {
+  try { againCounts = JSON.parse(localStorage.getItem('sp_again') || '{}'); } catch(e) { againCounts = {}; }
+}
+function saveAgainCounts() {
+  localStorage.setItem('sp_again', JSON.stringify(againCounts));
+}
+function renderWeakPhrases() {
+  const list = document.getElementById('weak-list');
+  if (!list) return;
+  const weak = Object.entries(againCounts)
+    .filter(([,c]) => c >= 3)
+    .sort(([,a],[,b]) => b - a)
+    .slice(0, 20);
+  if (weak.length === 0) {
+    list.innerHTML = '<div class="weak-empty">Aún sin puntos débiles — ¡buen trabajo! Las frases que repites 3+ veces aparecerán aquí.</div>';
+    return;
+  }
+  list.innerHTML = weak.map(([en, count]) => {
+    const phrase = phrases.find(p => p.en === en);
+    const es = phrase ? phrase.es : '—';
+    return `<div class="weak-card" onclick="searchWeak('${en.replace(/'/g,"\\'")}')">
+      <div class="weak-en">${en}</div>
+      <div class="weak-es">${es}</div>
+      <div class="weak-badge">× ${count}</div>
+    </div>`;
+  }).join('');
+}
+function searchWeak(en) {
+  document.getElementById('searchInput').value = en;
+  handleSearch();
+  toast('Busca → ' + en.slice(0,30), false);
+}
+
+// ============================================================
+// TEXT EXTRACTOR
+// ============================================================
+let extractedPhrases = [];
+function extractPhrases() {
+  const raw = (document.getElementById('extractor-input')?.value || '').trim();
+  if (!raw) { toast('Pega un texto primero', true); return; }
+
+  // Split into sentences
+  const sentences = raw.match(/[^.!?\n]+[.!?]?/g) || [];
+  const allPhraseKeys = new Set([...phrases.map(p => p.en.toLowerCase()), ...myPhrases.map(p => (p.en||'').toLowerCase())]);
+
+  extractedPhrases = sentences
+    .map(s => s.trim().replace(/^["'""'']+|["'""'']+$/g,'').trim())
+    .filter(s => s.split(' ').length >= 2 && s.split(' ').length <= 12 && s.length > 4)
+    .filter(s => /[a-zA-Z]/.test(s))
+    .map(s => ({ en: s, known: allPhraseKeys.has(s.toLowerCase()) }))
+    .reduce((acc, item) => { // deduplicar
+      if (!acc.find(x => x.en.toLowerCase() === item.en.toLowerCase())) acc.push(item);
+      return acc;
+    }, [])
+    .slice(0, 30);
+
+  if (extractedPhrases.length === 0) { toast('No se encontraron frases en inglés', true); return; }
+
+  const resultsEl = document.getElementById('extracted-results');
+  const listEl = document.getElementById('extracted-list');
+  const countEl = document.getElementById('extracted-count');
+  countEl.textContent = `${extractedPhrases.length} frases encontradas`;
+  listEl.innerHTML = extractedPhrases.map((item, i) => `
+    <div class="extracted-item${item.known ? '' : ' selected'}" id="ext-item-${i}" onclick="toggleExtracted(${i})">
+      <div class="extracted-check">${item.known ? '' : '✓'}</div>
+      <div class="extracted-en">${item.en}</div>
+      ${item.known ? '<div class="extracted-known">✓ Ya la tienes</div>' : ''}
+    </div>
+  `).join('');
+  resultsEl.style.display = 'block';
+}
+function toggleExtracted(i) {
+  const el = document.getElementById(`ext-item-${i}`);
+  if (!el) return;
+  el.classList.toggle('selected');
+  el.querySelector('.extracted-check').textContent = el.classList.contains('selected') ? '✓' : '';
+}
+function selectAllExtracted() {
+  extractedPhrases.forEach((_, i) => {
+    const el = document.getElementById(`ext-item-${i}`);
+    if (el && !el.classList.contains('selected')) { el.classList.add('selected'); el.querySelector('.extracted-check').textContent = '✓'; }
+  });
+}
+function addSelectedExtracted() {
+  const selected = extractedPhrases.filter((_, i) => document.getElementById(`ext-item-${i}`)?.classList.contains('selected'));
+  if (selected.length === 0) { toast('Selecciona al menos una frase', true); return; }
+  let added = 0;
+  selected.forEach(item => {
+    if (myPhrases.find(p => (p.en||'').toLowerCase() === item.en.toLowerCase())) return;
+    myPhrases.push({ en: item.en, es: '(pendiente — toca IA para completar)', pron: item.en.toLowerCase(), tip: '', category: '🌍 Del mundo real', examples: [], id: Date.now() + Math.random(), isCustom: true, createdAt: new Date().toISOString() });
+    added++;
+  });
+  saveToStorage();
+  renderMyPhrases();
+  document.getElementById('extracted-results').style.display = 'none';
+  document.getElementById('extractor-input').value = '';
+  toast(`✅ ${added} frase${added!==1?'s':''} agregada${added!==1?'s':''} al mazo`, false);
 }
 
 function updateSessionHeader() {
@@ -2001,15 +2339,30 @@ function renderCard() {
   const words = p.en.split(' ');
   document.getElementById('karaoke-phrase').innerHTML = words.map((w, i) => `<span class="k-word idle" id="kw-${i}">${w}</span>`).join('');
 
-  // Reset Anki recall — hide answer until user taps "Ver traducción" (unless fast mode)
+  // Reset Anki recall — modo normal, escritura o rápido
   const answerEl = document.getElementById('fc-answer');
   const coverEl = document.getElementById('recall-cover');
+  const typingWrap = document.getElementById('typing-wrap');
+  const typingResult = document.getElementById('typing-result');
+  const typingInput = document.getElementById('typing-input');
+  if (typingResult) typingResult.style.display = 'none';
+  if (typingInput) typingInput.value = '';
+  // Quitar outline de sugerencia SM-2
+  document.querySelectorAll('.sm2-btn').forEach(b => b.style.outline = 'none');
+
   if (fastMode) {
-    if (answerEl) answerEl.classList.add('revealed');
     if (coverEl) coverEl.style.display = 'none';
-  } else {
+    if (typingWrap) typingWrap.style.display = 'none';
+    if (answerEl) answerEl.classList.add('revealed');
+  } else if (typingMode) {
+    if (coverEl) coverEl.style.display = 'none';
+    if (typingWrap) typingWrap.style.display = 'block';
     if (answerEl) answerEl.classList.remove('revealed');
+    setTimeout(() => typingInput?.focus(), 100);
+  } else {
     if (coverEl) coverEl.style.display = '';
+    if (typingWrap) typingWrap.style.display = 'none';
+    if (answerEl) answerEl.classList.remove('revealed');
   }
 
   // Reset pronunciation result
@@ -2019,6 +2372,8 @@ function renderCard() {
   isRecording = false;
 
   updateStats();
+  renderActivityCalendar();
+  renderWeakPhrases();
 }
 
 function updateStats() {
@@ -2054,7 +2409,7 @@ function speakPhrase() {
   // Karaoke sync while speaking
   const words = p.en.split(' ');
   const utter = new SpeechSynthesisUtterance(p.en);
-  utter.lang = 'en-US'; utter.rate = 0.82;
+  utter.lang = 'en-US'; utter.rate = speechRate;
 
   // Estimate timing per word
   const totalDuration = (p.en.length * 60) + (words.length * 200);
@@ -2667,7 +3022,7 @@ function speakModalPhrase(text, wordCount) {
   window.speechSynthesis.cancel();
   const words = text.split(' ');
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'en-US'; utter.rate = 0.82;
+  utter.lang = 'en-US'; utter.rate = speechRate;
   const dur = (text.length * 60 + words.length * 200) / words.length;
   let wi = 0;
   words.forEach((_,i) => { const el = document.getElementById('mkw-'+i); if(el) el.className='k-word idle'; });
@@ -2847,6 +3202,8 @@ document.addEventListener('keydown', e => {
 function appInit() {
   loadSM2();
   loadSessionToday();
+  loadAgainCounts();
+  loadActivityData();
   filterPhrases();
   renderCats();
   renderCard();
@@ -2910,6 +3267,22 @@ if (document.readyState === 'loading') {
       <div style="display:flex;gap:10px">
         <button class="btn" style="flex:0;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:13px 18px;border-radius:13px;font-family:Outfit,sans-serif;font-size:14px;font-weight:600;cursor:pointer" onclick="generatePhrase()">⚡ Generar con IA</button>
         <button class="btn-add-confirm" id="btn-save-phrase" onclick="savePhrase()" disabled>💾 Guardar frase</button>
+      </div>
+    </div>
+
+    <!-- TEXT EXTRACTOR -->
+    <div class="extractor-wrap">
+      <div class="extractor-title">🌍 Aprende desde tu vida real</div>
+      <div class="extractor-sub">Pega cualquier texto en inglés (email, serie, canción, WhatsApp...) y detectamos automáticamente las frases para agregar a tu mazo.</div>
+      <textarea class="extractor-textarea" id="extractor-input" placeholder="Paste any English text here... For example: 'I was wondering if you could give me a hand with this. It's a bit of a long shot but worth trying.'"></textarea>
+      <button class="btn-add-confirm" onclick="extractPhrases()" style="margin-bottom:12px">🔍 Extraer frases</button>
+      <div id="extracted-results" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--muted)" id="extracted-count">0 frases encontradas</span>
+          <button style="background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif" onclick="selectAllExtracted()">Seleccionar todas</button>
+        </div>
+        <div class="extracted-list" id="extracted-list"></div>
+        <button class="btn-add-confirm" onclick="addSelectedExtracted()">➕ Agregar seleccionadas al mazo</button>
       </div>
     </div>
 
