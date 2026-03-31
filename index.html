@@ -200,6 +200,36 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 @keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:.6}}
 .new-badge{background:rgba(108,99,255,.15);color:var(--accent);border-color:rgba(108,99,255,.3);animation:none}
 
+/* SESSION HEADER */
+.session-header{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 16px;margin-bottom:14px;gap:10px}
+.session-progress{display:flex;align-items:center;gap:12px;flex:1}
+.session-stat{text-align:center}
+.session-stat .s-num{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;line-height:1}
+.session-stat .s-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.s-num.pending{color:var(--accent2)}
+.s-num.done{color:var(--green)}
+.s-num.streak{background:linear-gradient(135deg,var(--yellow),#ff9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.session-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+.session-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .5s ease}
+.btn-explore{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-explore:hover,.btn-explore.on{border-color:var(--accent);color:var(--accent);background:rgba(108,99,255,.08)}
+
+/* SESSION COMPLETE */
+.session-complete{display:none;text-align:center;padding:40px 20px}
+.session-complete.show{display:block}
+.sc-icon{font-size:64px;margin-bottom:16px;animation:sc-bounce .6s ease}
+@keyframes sc-bounce{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.sc-title{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--green),#00c9a7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.sc-subtitle{font-size:15px;color:var(--muted);margin-bottom:28px;line-height:1.5}
+.sc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.sc-stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center}
+.sc-stat .n{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sc-stat .l{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.sc-next{background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.15);border-radius:12px;padding:14px;font-size:13px;color:#c0c0d8;margin-bottom:20px;line-height:1.6}
+.sc-next strong{color:var(--green)}
+.btn-explore-all{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:13px;border-radius:13px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-explore-all:hover{border-color:var(--accent);color:var(--accent)}
+
 /* SM-2 DASHBOARD */
 .sm2-dash{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:14px}
 .sm2-dash-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
@@ -496,6 +526,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="bar"><div class="bar-fill" id="prog-fill" style="width:0%"></div></div>
     </div>
 
+    <!-- SESSION HEADER -->
+    <div class="session-header">
+      <div class="session-progress">
+        <div class="session-stat">
+          <div class="s-num pending" id="sh-pending">0</div>
+          <div class="s-lbl">Hoy</div>
+        </div>
+        <div class="session-bar-wrap">
+          <div class="session-bar-fill" id="sh-bar" style="width:0%"></div>
+        </div>
+        <div class="session-stat">
+          <div class="s-num done" id="sh-done">0</div>
+          <div class="s-lbl">Hechas</div>
+        </div>
+        <div class="session-stat" style="margin-left:4px">
+          <div class="s-num streak" id="sh-streak">0</div>
+          <div class="s-lbl">Racha🔥</div>
+        </div>
+      </div>
+      <button class="btn-explore" id="btn-explore" onclick="toggleExploreMode()">Explorar</button>
+    </div>
+
     <!-- LEVEL PROGRESS -->
     <div class="level-progress">
       <div class="lp-title">🎓 Tu progreso por nivel</div>
@@ -522,9 +574,25 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
     <div class="cats" id="cats"></div>
 
-    <div id="empty-state" class="empty" style="display:none">
-      <h3>Sin resultados</h3>
-      <p>Intenta con otra palabra</p>
+    <div id="empty-state" style="display:none">
+      <!-- Session complete screen -->
+      <div class="session-complete" id="session-complete">
+        <div class="sc-icon">🎉</div>
+        <div class="sc-title">¡Sesión completada!</div>
+        <div class="sc-subtitle" id="sc-subtitle">Has repasado todas las frases de hoy.<br>Tu cerebro está consolidando el aprendizaje.</div>
+        <div class="sc-stats">
+          <div class="sc-stat"><div class="n" id="sc-done">0</div><div class="l">Estudiadas hoy</div></div>
+          <div class="sc-stat"><div class="n" id="sc-streak">0</div><div class="l">Racha 🔥</div></div>
+          <div class="sc-stat"><div class="n" id="sc-total">0</div><div class="l">Total aprendidas</div></div>
+        </div>
+        <div class="sc-next" id="sc-next">Vuelve mañana para continuar.</div>
+        <button class="btn-explore-all" onclick="toggleExploreMode()">📚 Explorar todas las frases</button>
+      </div>
+      <!-- No search results -->
+      <div id="no-results" style="display:none;text-align:center;padding:40px 20px">
+        <h3 style="color:var(--muted)">Sin resultados</h3>
+        <p style="color:var(--muted);margin-top:6px">Intenta con otra palabra</p>
+      </div>
     </div>
 
     <div class="flashcard" id="fc">
@@ -1772,7 +1840,10 @@ function rateSM2(quality) {
   sm2Data[phrase.en] = result;
   saveSM2Local();
 
-  // Update learned set and streak
+  // Marcar como hecha en esta sesión (se oculta hasta mañana)
+  sessionDoneToday.add(phrase.en);
+
+  // Streak: solo incrementa en >= 3, nunca se rompe por dificultad
   if (quality >= 3) {
     learned.add(phrase.en);
     streak++;
@@ -1780,18 +1851,20 @@ function rateSM2(quality) {
   saveProgress(phrase.en, quality >= 4 ? 'learned' : 'review', quality * 20);
   saveStats();
 
-  // Feedback toast
   const msgs = {
-    1: '🔄 La vemos mañana de nuevo',
+    1: `🔄 Programada para mañana`,
     3: `📅 Revisión en ${result.interval} días`,
-    4: `✅ Bien. Revisión en ${result.interval} días`,
-    5: `⚡ Excelente. Revisión en ${result.interval} días`
+    4: `✅ Bien — en ${result.interval} días`,
+    5: `⚡ Excelente — en ${result.interval} días`
   };
   toast(msgs[quality], quality < 3);
 
-  nextCard();
+  // Re-filtrar (la frase ya no aparece) y renderizar siguiente
+  filterPhrases();
+  renderCard();
   updateDashboard();
   updateLevelProgress();
+  updateSessionHeader();
 }
 
 function updateDashboard() {
@@ -1873,6 +1946,8 @@ let recognition = null;
 let karaokeInterval = null;
 let currentSituation = null;
 let isChatRecording = false;
+let exploreMode = false;
+let sessionDoneToday = new Set(); // frases completadas en la sesión de hoy
 
 // ============================================================
 // FLASHCARDS
@@ -1884,26 +1959,89 @@ function filterPhrases() {
   if (activeLevel) base = base.filter(p => getPhraseLevel(p) === activeLevel);
   if (searchQ) { const q = searchQ.toLowerCase(); base = base.filter(p => p.en.toLowerCase().includes(q) || p.es.toLowerCase().includes(q)); }
 
-  // SM-2 sort: overdue/new first, then future
   const today = new Date().toISOString().split('T')[0];
+
+  // MODO SESIÓN (default): solo muestra frases debidas hoy, sin las ya hechas en esta sesión
+  if (!exploreMode && !searchQ) {
+    base = base.filter(p => {
+      if (sessionDoneToday.has(p.en)) return false;
+      const s = getSM2State(p.en);
+      return !s.nextReview || s.nextReview <= today;
+    });
+  }
+
+  // Ordenar: más vencidas primero, nuevas al final
   base = [...base].sort((a, b) => {
     const sa = getSM2State(a.en), sb = getSM2State(b.en);
-    const aDue = !sa.nextReview || sa.nextReview <= today;
-    const bDue = !sb.nextReview || sb.nextReview <= today;
-    if (aDue && !bDue) return -1;
-    if (!aDue && bDue) return 1;
-    if (aDue && bDue) {
-      // Both due: most overdue first; new cards (no nextReview) go last among due
-      if (!sa.nextReview && !sb.nextReview) return 0;
-      if (!sa.nextReview) return 1;
-      if (!sb.nextReview) return -1;
-      return sa.nextReview < sb.nextReview ? -1 : 1;
-    }
+    if (!sa.nextReview && !sb.nextReview) return 0;
+    if (!sa.nextReview) return 1;
+    if (!sb.nextReview) return -1;
     return sa.nextReview < sb.nextReview ? -1 : 1;
   });
 
   filtered = base;
   if (currentIdx >= filtered.length) currentIdx = 0;
+}
+
+function toggleExploreMode() {
+  exploreMode = !exploreMode;
+  const btn = document.getElementById('btn-explore');
+  if (btn) btn.classList.toggle('on', exploreMode);
+  currentIdx = 0;
+  filterPhrases();
+  renderCats();
+  renderCard();
+}
+
+function updateSessionHeader() {
+  const today = new Date().toISOString().split('T')[0];
+  const totalDueToday = phrases.filter(p => {
+    const s = getSM2State(p.en);
+    return !s.nextReview || s.nextReview <= today;
+  }).length;
+  const doneCount = sessionDoneToday.size;
+  const pendingCount = Math.max(0, totalDueToday - doneCount);
+  const pct = totalDueToday > 0 ? Math.round((doneCount / totalDueToday) * 100) : 0;
+
+  const shPending = document.getElementById('sh-pending');
+  const shDone = document.getElementById('sh-done');
+  const shStreak = document.getElementById('sh-streak');
+  const shBar = document.getElementById('sh-bar');
+  if (shPending) shPending.textContent = pendingCount;
+  if (shDone) shDone.textContent = doneCount;
+  if (shStreak) shStreak.textContent = streak;
+  if (shBar) shBar.style.width = pct + '%';
+}
+
+function showSessionComplete() {
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const tomorrowCount = phrases.filter(p => getSM2State(p.en).nextReview === tomorrowStr).length;
+  const futureCount = phrases.filter(p => {
+    const s = getSM2State(p.en);
+    return s.nextReview && s.nextReview > today;
+  }).length;
+
+  const sc = document.getElementById('session-complete');
+  const nr = document.getElementById('no-results');
+  if (sc) sc.classList.add('show');
+  if (nr) nr.style.display = 'none';
+
+  const scDone = document.getElementById('sc-done');
+  const scStreak = document.getElementById('sc-streak');
+  const scTotal = document.getElementById('sc-total');
+  const scNext = document.getElementById('sc-next');
+  const scSub = document.getElementById('sc-subtitle');
+  if (scDone) scDone.textContent = sessionDoneToday.size;
+  if (scStreak) scStreak.textContent = streak;
+  if (scTotal) scTotal.textContent = learned.size;
+  if (scNext) scNext.innerHTML = tomorrowCount > 0
+    ? `Mañana tienes <strong>${tomorrowCount} frases</strong> programadas. El SM-2 está construyendo tu memoria a largo plazo.`
+    : `Tienes <strong>${futureCount} frases</strong> programadas para los próximos días. ¡Vuelve mañana!`;
+  if (scSub) scSub.textContent = sessionDoneToday.size === 0
+    ? 'No hay frases pendientes para hoy. ¡Estás al día!'
+    : `Revisaste ${sessionDoneToday.size} frases hoy. Tu cerebro está consolidando el aprendizaje.`;
 }
 
 function handleSearch() { searchQ = document.getElementById('searchInput').value; filterPhrases(); renderCard(); }
@@ -1920,8 +2058,30 @@ function selectCat(c) { currentCat = c; currentIdx = 0; filterPhrases(); renderC
 function renderCard() {
   const empty = document.getElementById('empty-state');
   const fc = document.getElementById('fc');
-  if (filtered.length === 0) { empty.style.display = 'block'; fc.style.display = 'none'; updateStats(); return; }
-  empty.style.display = 'none'; fc.style.display = 'block';
+  const sc = document.getElementById('session-complete');
+  const nr = document.getElementById('no-results');
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    fc.style.display = 'none';
+    if (sc) sc.classList.remove('show');
+    if (nr) nr.style.display = 'none';
+    if (searchQ) {
+      // No search results
+      if (nr) nr.style.display = 'block';
+    } else if (!exploreMode) {
+      // Session complete
+      showSessionComplete();
+    } else {
+      if (nr) nr.style.display = 'block';
+    }
+    updateStats();
+    updateSessionHeader();
+    return;
+  }
+
+  empty.style.display = 'none';
+  fc.style.display = 'block';
   updateDashboard();
   fc.classList.remove('anim'); void fc.offsetWidth; fc.classList.add('anim');
 
@@ -2287,11 +2447,20 @@ function stopMicChat() { isChatRecording = false; document.getElementById('mic-c
 // NAVIGATION
 // ============================================================
 function showPage(id) {
+  // Detener shadowing al cambiar de página
+  if (shadowMode) {
+    shadowMode = false;
+    clearTimeout(shadowTimer);
+    const toggle = document.getElementById('shadow-toggle');
+    if (toggle) toggle.classList.remove('shadow-on');
+  }
+  if (isRecording) stopRecognition();
+  window.speechSynthesis && window.speechSynthesis.cancel();
+
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   event.currentTarget.classList.add('active');
-  window.speechSynthesis && window.speechSynthesis.cancel();
 }
 
 // ============================================================
@@ -2741,6 +2910,7 @@ function appInit() {
   renderMyPhrases();
   updateDashboard();
   updateLevelProgress();
+  updateSessionHeader();
   var overlay = document.getElementById('practice-modal');
   if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
   // Init Supabase auth
