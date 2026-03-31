@@ -1659,7 +1659,9 @@ function filterByLevel(lvl) {
 // MODO SHADOWING
 // ============================================================
 let shadowMode = false;
-let shadowTimer = null;
+let shadowTimer = null;       // setTimeout ID para auto-avanzar
+let shadowInterval = null;    // setInterval ID para countdown
+let shadowRecognition = null; // referencia al SpeechRecognition activo
 
 function toggleShadowMode() {
   shadowMode = !shadowMode;
@@ -1672,6 +1674,9 @@ function toggleShadowMode() {
     startShadowCard();
   } else {
     clearTimeout(shadowTimer);
+    clearInterval(shadowInterval);
+    shadowTimer = null; shadowInterval = null;
+    if (shadowRecognition) { try { shadowRecognition.stop(); } catch(e){} shadowRecognition = null; }
     if (isRecording) stopRecognition();
     document.getElementById('shadow-card').classList.remove('show');
     document.getElementById('karaoke-wrap').style.display = '';
@@ -1686,6 +1691,10 @@ function toggleShadowMode() {
 
 function startShadowCard() {
   if (!shadowMode || !filtered.length) return;
+  // Limpiar timers y recognition previos antes de iniciar nueva carta
+  clearTimeout(shadowTimer); shadowTimer = null;
+  clearInterval(shadowInterval); shadowInterval = null;
+  if (shadowRecognition) { try { shadowRecognition.stop(); } catch(e){} shadowRecognition = null; }
   const p = filtered[currentIdx];
 
   // Hide normal elements
@@ -1725,12 +1734,15 @@ function shadowCountdown(p) {
   document.getElementById('shadow-mic-anim').style.display = 'flex';
   let n = 3;
   document.getElementById('shadow-countdown').textContent = n;
-  shadowTimer = setInterval(() => {
+  clearInterval(shadowInterval);
+  shadowInterval = setInterval(() => {
+    if (!shadowMode) { clearInterval(shadowInterval); return; }
     n--;
     if (n > 0) {
       document.getElementById('shadow-countdown').textContent = n;
     } else {
-      clearInterval(shadowTimer);
+      clearInterval(shadowInterval);
+      shadowInterval = null;
       document.getElementById('shadow-countdown').textContent = '';
       startShadowRecording(p);
     }
@@ -1740,12 +1752,18 @@ function shadowCountdown(p) {
 function startShadowRecording(p) {
   if (!shadowMode) return;
   if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-    toast('Usa Chrome para reconocimiento de voz', true); return;
+    // Sin reconocimiento de voz: auto-avanzar después de 3s
+    shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 3000);
+    return;
   }
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   const rec = new SpeechRec();
+  shadowRecognition = rec;
   rec.lang = 'en-US'; rec.interimResults = false; rec.continuous = false;
+
   rec.onresult = (e) => {
+    if (!shadowMode) return;
+    shadowRecognition = null;
     const said = e.results[0][0].transcript;
     const score = scorePronunciation(said, p.en);
     const pct = Math.round(score * 100);
@@ -1757,31 +1775,39 @@ function startShadowRecording(p) {
     const state = getSM2State(p.en);
     const result = sm2Calc(state.ef, state.interval, state.reps, q);
     sm2Data[p.en] = result; saveSM2Local();
+    sessionDoneToday.add(p.en); // marcar como hecha para no repetir en esta sesión
     if (q >= 3) { learned.add(p.en); streak++; }
     saveProgress(p.en, q >= 4 ? 'learned' : 'review', pct);
     saveStats();
-    updateDashboard(); updateLevelProgress();
-    // Auto-next after 2.5s
-    shadowTimer = setTimeout(() => {
-      nextCard();
-      if (shadowMode) startShadowCard();
-    }, 2500);
+    updateDashboard(); updateLevelProgress(); updateSessionHeader();
+    // Auto-next: renderCard() se encarga de iniciar shadow en la siguiente carta
+    shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 2500);
   };
+
   rec.onerror = () => {
+    if (!shadowMode) return;
+    shadowRecognition = null;
     document.getElementById('shadow-mic-anim').style.display = 'none';
     document.getElementById('shadow-status').textContent = '❌ No te escuché. Siguiente...';
-    shadowTimer = setTimeout(() => {
-      nextCard();
-      if (shadowMode) startShadowCard();
-    }, 1500);
+    shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 1500);
   };
-  rec.start();
+
+  try { rec.start(); } catch(e) { shadowRecognition = null; }
 }
 
 // ============================================================
 // SM-2 SPACED REPETITION ALGORITHM
 // ============================================================
 let sm2Data = {}; // { phraseEn: { ef, interval, reps, nextReview } }
+
+// Devuelve fecha local "YYYY-MM-DD" sin conversión UTC
+function getLocalDateStr(date) {
+  const d = date || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 function loadSM2() {
   try { sm2Data = JSON.parse(localStorage.getItem('sp_sm2') || '{}'); }
@@ -1812,18 +1838,17 @@ function sm2Calc(ef, interval, reps, quality) {
   if (ef > 2.9) ef = 2.9;
   const next = new Date();
   next.setDate(next.getDate() + interval);
-  next.setHours(0, 0, 0, 0);
-  return { ef, interval, reps, nextReview: next.toISOString().split('T')[0] };
+  return { ef, interval, reps, nextReview: getLocalDateStr(next) };
 }
 
 function isDueToday(phraseEn) {
   const s = getSM2State(phraseEn);
   if (!s.nextReview) return true;
-  return s.nextReview <= new Date().toISOString().split('T')[0];
+  return s.nextReview <= getLocalDateStr();
 }
 
 function getDueCount() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
   return phrases.filter(p => {
     const s = getSM2State(p.en);
     return !s.nextReview || s.nextReview <= today;
@@ -1836,7 +1861,7 @@ function getWeekSchedule() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const dateStr = d.toISOString().split('T')[0];
+    const dateStr = getLocalDateStr(d);
     const count = phrases.filter(p => getSM2State(p.en).nextReview === dateStr).length;
     schedule.push({ d, dateStr, count });
   }
@@ -1977,7 +2002,7 @@ function filterPhrases() {
   if (activeLevel) base = base.filter(p => getPhraseLevel(p) === activeLevel);
   if (searchQ) { const q = searchQ.toLowerCase(); base = base.filter(p => p.en.toLowerCase().includes(q) || p.es.toLowerCase().includes(q)); }
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
 
   // MODO SESIÓN (default): solo muestra frases debidas hoy, sin las ya hechas en esta sesión
   if (!exploreMode && !searchQ) {
@@ -2012,7 +2037,7 @@ function toggleExploreMode() {
 }
 
 function updateSessionHeader() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
   const totalDueToday = phrases.filter(p => {
     const s = getSM2State(p.en);
     return !s.nextReview || s.nextReview <= today;
@@ -2032,13 +2057,14 @@ function updateSessionHeader() {
 }
 
 function showSessionComplete() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
   const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const tomorrowStr = getLocalDateStr(tomorrow);
   const tomorrowCount = phrases.filter(p => getSM2State(p.en).nextReview === tomorrowStr).length;
+  const todayStr = getLocalDateStr();
   const futureCount = phrases.filter(p => {
     const s = getSM2State(p.en);
-    return s.nextReview && s.nextReview > today;
+    return s.nextReview && s.nextReview > todayStr;
   }).length;
 
   const sc = document.getElementById('session-complete');
@@ -2483,6 +2509,9 @@ function showPage(id) {
   if (shadowMode) {
     shadowMode = false;
     clearTimeout(shadowTimer);
+    clearTimeout(shadowTimer); shadowTimer = null;
+    clearInterval(shadowInterval); shadowInterval = null;
+    if (shadowRecognition) { try { shadowRecognition.stop(); } catch(e){} shadowRecognition = null; }
     const toggle = document.getElementById('shadow-toggle');
     if (toggle) toggle.classList.remove('shadow-on');
     const iconBtn = document.getElementById('shadow-icon-btn');
