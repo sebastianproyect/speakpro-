@@ -965,9 +965,11 @@ async function loadUserData() {
     if (myPhrasesData) {
       myPhrases = myPhrasesData.map(p => ({
         ...p,
+        en: p.phrase_en || p.en,   // Supabase usa phrase_en, el código espera en
         examples: p.examples || [],
         isCustom: true
       }));
+      saveToStorage(); // sincronizar localStorage con Supabase
     }
 
     // Load stats
@@ -1721,12 +1723,22 @@ function startShadowCard() {
   document.getElementById('shadow-mic-anim').style.display = 'none';
   document.getElementById('shadow-status').textContent = '🎧 Escucha con atención...';
 
-  // Play audio
+  // Play audio con safety timeout (Chrome no siempre dispara onend)
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(p.en);
     utter.lang = 'en-US'; utter.rate = 0.78;
-    utter.onend = () => { shadowCountdown(p); };
+    let synthHandled = false;
+    const safetyMs = Math.max(2500, p.en.split(' ').length * 450 + 1200);
+    const safetyTimeout = setTimeout(() => {
+      if (!synthHandled && shadowMode) { synthHandled = true; shadowCountdown(p); }
+    }, safetyMs);
+    utter.onend = () => {
+      if (synthHandled) return;
+      synthHandled = true;
+      clearTimeout(safetyTimeout);
+      if (shadowMode) shadowCountdown(p);
+    };
     window.speechSynthesis.speak(utter);
   } else {
     shadowCountdown(p);
@@ -1765,9 +1777,11 @@ function startShadowRecording(p) {
   const rec = new SpeechRec();
   shadowRecognition = rec;
   rec.lang = 'en-US'; rec.interimResults = false; rec.continuous = false;
+  let recHandled = false; // guard para que onresult/onerror/onend no choquen
 
   rec.onresult = (e) => {
-    if (!shadowMode) return;
+    if (recHandled || !shadowMode) return;
+    recHandled = true;
     shadowRecognition = null;
     const said = e.results[0][0].transcript;
     const score = scorePronunciation(said, p.en);
@@ -1775,30 +1789,42 @@ function startShadowRecording(p) {
     document.getElementById('shadow-mic-anim').style.display = 'none';
     document.getElementById('shadow-status').textContent = pct >= 80 ? '⚡ Excelente!' : pct >= 55 ? '🟢 Bien!' : '🔴 Sigue practicando';
     document.getElementById('shadow-reveal').textContent = '👁 "' + p.en + '"  —  ' + pct + '%';
-    // Auto quality for SM-2
     const q = pct >= 80 ? 5 : pct >= 55 ? 4 : pct >= 35 ? 3 : 1;
     const state = getSM2State(p.en);
     const result = sm2Calc(state.ef, state.interval, state.reps, q);
     sm2Data[p.en] = result; saveSM2Local();
-    sessionDoneToday.add(p.en); // marcar como hecha para no repetir en esta sesión
-    saveSessionToday();
+    sessionDoneToday.add(p.en); saveSessionToday();
     if (q >= 3) { learned.add(p.en); streak++; }
     saveProgress(p.en, q >= 4 ? 'learned' : 'review', pct);
     saveStats();
     updateDashboard(); updateLevelProgress(); updateSessionHeader();
-    // Auto-next: renderCard() se encarga de iniciar shadow en la siguiente carta
     shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 2500);
   };
 
   rec.onerror = () => {
-    if (!shadowMode) return;
+    if (recHandled || !shadowMode) return;
+    recHandled = true;
     shadowRecognition = null;
     document.getElementById('shadow-mic-anim').style.display = 'none';
     document.getElementById('shadow-status').textContent = '❌ No te escuché. Siguiente...';
     shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 1500);
   };
 
-  try { rec.start(); } catch(e) { shadowRecognition = null; }
+  // onend dispara cuando recognition termina sin resultado (timeout silencioso del browser)
+  rec.onend = () => {
+    if (recHandled || !shadowMode) return;
+    recHandled = true;
+    shadowRecognition = null;
+    document.getElementById('shadow-mic-anim').style.display = 'none';
+    document.getElementById('shadow-status').textContent = '⏭ Sin audio. Siguiente...';
+    shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 1200);
+  };
+
+  try { rec.start(); } catch(e) {
+    shadowRecognition = null;
+    document.getElementById('shadow-status').textContent = '❌ Sin acceso al micrófono';
+    shadowTimer = setTimeout(() => { if (shadowMode) nextCard(); }, 2000);
+  }
 }
 
 // ============================================================
@@ -2740,7 +2766,8 @@ async function savePhrase() {
   if (currentUser) {
     const saved = await saveMyPhraseToDB({ ...pendingPhrase, category: cat });
     if (saved) {
-      myPhrases.unshift({ ...saved, examples: saved.examples || [], isCustom: true });
+      myPhrases.unshift({ ...saved, en: saved.phrase_en || saved.en, examples: saved.examples || [], isCustom: true });
+      saveToStorage();
     } else {
       const newPhrase = { ...pendingPhrase, category: cat, id: Date.now(), isCustom: true };
       myPhrases.unshift(newPhrase);
@@ -2763,7 +2790,7 @@ async function savePhrase() {
 }
 
 async function deletePhrase(id) {
-  myPhrases = myPhrases.filter(p => p.id !== id);
+  myPhrases = myPhrases.filter(p => String(p.id) !== String(id));
   saveToStorage();
   if (currentUser) await deleteMyPhraseFromDB(id);
   renderMyPhrases();
@@ -2814,15 +2841,15 @@ function renderMyPhrases() {
         ${p.examples.map(e => `<div class="mp-card-ex">${e.en}<div class="mp-card-ex-es">${e.es}</div></div>`).join('')}
       </div>
       <div class="mp-card-actions">
-        <button class="mp-btn-practice" onclick="practiceMyPhrase(${p.id})">🎤 Practicar con karaoke</button>
-        <button class="mp-btn-delete" onclick="deletePhrase(${p.id})">🗑️</button>
+        <button class="mp-btn-practice" onclick="practiceMyPhrase('${p.id}')">🎤 Practicar con karaoke</button>
+        <button class="mp-btn-delete" onclick="deletePhrase('${p.id}')">🗑️</button>
       </div>
     </div>
   `).join('');
 }
 
 function practiceMyPhrase(id) {
-  const p = myPhrases.find(x => x.id === id);
+  const p = myPhrases.find(x => String(x.id) === String(id));
   if (!p) return;
 
   const modal = document.getElementById('practice-modal');
