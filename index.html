@@ -235,6 +235,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .session-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .5s ease}
 .btn-explore{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn-explore:hover,.btn-explore.on{border-color:var(--accent);color:var(--accent);background:rgba(108,99,255,.08)}
+.btn-fast{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-fast:hover,.btn-fast.on{border-color:var(--yellow);color:var(--yellow);background:rgba(255,214,10,.08)}
 
 /* SESSION COMPLETE */
 .session-complete{display:none;text-align:center;padding:40px 20px}
@@ -555,7 +557,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="s-lbl">Racha🔥</div>
         </div>
       </div>
-      <button class="btn-explore" id="btn-explore" onclick="toggleExploreMode()">Explorar</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn-fast" id="btn-fast" onclick="toggleFastMode()" title="Modo rápido: muestra la respuesta automáticamente">⚡</button>
+        <button class="btn-explore" id="btn-explore" onclick="toggleExploreMode()">Explorar</button>
+      </div>
     </div>
 
     <!-- LEVEL PROGRESS (collapsible) -->
@@ -1776,6 +1781,7 @@ function startShadowRecording(p) {
     const result = sm2Calc(state.ef, state.interval, state.reps, q);
     sm2Data[p.en] = result; saveSM2Local();
     sessionDoneToday.add(p.en); // marcar como hecha para no repetir en esta sesión
+    saveSessionToday();
     if (q >= 3) { learned.add(p.en); streak++; }
     saveProgress(p.en, q >= 4 ? 'learned' : 'review', pct);
     saveStats();
@@ -1816,6 +1822,22 @@ function loadSM2() {
 
 function saveSM2Local() {
   localStorage.setItem('sp_sm2', JSON.stringify(sm2Data));
+}
+
+function loadSessionToday() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('sp_session_today') || '{}');
+    if (saved.date === getLocalDateStr()) {
+      sessionDoneToday = new Set(saved.phrases || []);
+    }
+  } catch(e) {}
+}
+
+function saveSessionToday() {
+  localStorage.setItem('sp_session_today', JSON.stringify({
+    date: getLocalDateStr(),
+    phrases: [...sessionDoneToday]
+  }));
 }
 
 function getSM2State(phraseEn) {
@@ -1885,6 +1907,7 @@ function rateSM2(quality) {
 
   // Marcar como hecha en esta sesión (se oculta hasta mañana)
   sessionDoneToday.add(phrase.en);
+  saveSessionToday();
 
   // Streak: solo incrementa en >= 3, nunca se rompe por dificultad
   if (quality >= 3) {
@@ -1990,6 +2013,7 @@ let karaokeInterval = null;
 let currentSituation = null;
 let isChatRecording = false;
 let exploreMode = false;
+let fastMode = false;
 let sessionDoneToday = new Set(); // frases completadas en la sesión de hoy
 
 // ============================================================
@@ -2034,6 +2058,13 @@ function toggleExploreMode() {
   filterPhrases();
   renderCats();
   renderCard();
+}
+
+function toggleFastMode() {
+  fastMode = !fastMode;
+  const btn = document.getElementById('btn-fast');
+  if (btn) btn.classList.toggle('on', fastMode);
+  toast(fastMode ? '⚡ Modo rápido ON — respuesta automática' : '⚡ Modo rápido OFF', false);
 }
 
 function updateSessionHeader() {
@@ -2127,7 +2158,7 @@ function renderCard() {
   empty.style.display = 'none';
   fc.style.display = 'block';
   updateDashboard();
-  fc.classList.remove('anim'); void fc.offsetWidth; fc.classList.add('anim');
+  if (!fastMode) { fc.classList.remove('anim'); void fc.offsetWidth; fc.classList.add('anim'); }
 
   const p = filtered[currentIdx];
   document.getElementById('fc-cat').textContent = p.category;
@@ -2145,11 +2176,16 @@ function renderCard() {
   const words = p.en.split(' ');
   document.getElementById('karaoke-phrase').innerHTML = words.map((w, i) => `<span class="k-word idle" id="kw-${i}">${w}</span>`).join('');
 
-  // Reset Anki recall — hide answer until user taps "Ver traducción"
+  // Reset Anki recall — hide answer until user taps "Ver traducción" (unless fast mode)
   const answerEl = document.getElementById('fc-answer');
   const coverEl = document.getElementById('recall-cover');
-  if (answerEl) answerEl.classList.remove('revealed');
-  if (coverEl) coverEl.style.display = '';
+  if (fastMode) {
+    if (answerEl) answerEl.classList.add('revealed');
+    if (coverEl) coverEl.style.display = 'none';
+  } else {
+    if (answerEl) answerEl.classList.remove('revealed');
+    if (coverEl) coverEl.style.display = '';
+  }
 
   // Reset pronunciation result
   document.getElementById('pronun-result').classList.remove('show');
@@ -2910,6 +2946,37 @@ function closeModal() {
   modalRecording = false;
 }
 
+function importBulkPhrases() {
+  const raw = (document.getElementById('bulk-textarea')?.value || '').trim();
+  if (!raw) { toast('Pega al menos una frase', true); return; }
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  let added = 0;
+  lines.forEach(line => {
+    const sep = line.includes('/') ? '/' : line.includes('-') ? '-' : null;
+    if (!sep) return;
+    const parts = line.split(sep);
+    if (parts.length < 2) return;
+    const en = parts[0].trim();
+    const es = parts.slice(1).join(sep).trim();
+    if (!en || !es) return;
+    if (myPhrases.find(p => p.en.toLowerCase() === en.toLowerCase())) return; // no duplicar
+    myPhrases.push({
+      en, es,
+      pron: en.toLowerCase(),
+      tip: '',
+      category: '📋 Importadas',
+      examples: [],
+      createdAt: new Date().toISOString()
+    });
+    added++;
+  });
+  if (added === 0) { toast('No se encontraron frases válidas', true); return; }
+  saveMyPhrases();
+  renderMyPhrases();
+  document.getElementById('bulk-textarea').value = '';
+  toast(`✅ ${added} frase${added > 1 ? 's' : ''} importada${added > 1 ? 's' : ''}`, false);
+}
+
 function exportPhrases() {
   if (myPhrases.length === 0) { toast('No tienes frases para exportar', true); return; }
   const blob = new Blob([JSON.stringify(myPhrases, null, 2)], { type: 'application/json' });
@@ -2965,6 +3032,7 @@ document.addEventListener('keydown', e => {
 // Safe init - runs after all DOM is ready
 function appInit() {
   loadSM2();
+  loadSessionToday();
   filterPhrases();
   renderCats();
   renderCard();
@@ -3029,6 +3097,14 @@ if (document.readyState === 'loading') {
         <button class="btn" style="flex:0;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:13px 18px;border-radius:13px;font-family:Outfit,sans-serif;font-size:14px;font-weight:600;cursor:pointer" onclick="generatePhrase()">⚡ Generar con IA</button>
         <button class="btn-add-confirm" id="btn-save-phrase" onclick="savePhrase()" disabled>💾 Guardar frase</button>
       </div>
+    </div>
+
+    <!-- BULK IMPORT -->
+    <div class="add-card" id="bulk-import-card" style="margin-bottom:20px">
+      <h3>📋 Importar frases en lote</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">Pega tus frases, una por línea. Formato: <strong style="color:var(--accent)">inglés / español</strong><br>Ejemplo: <em style="color:var(--muted)">I need help / Necesito ayuda</em></p>
+      <textarea id="bulk-textarea" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;resize:vertical;min-height:100px;transition:border-color .2s" placeholder="I need help / Necesito ayuda&#10;Can you repeat that? / ¿Puedes repetir?&#10;Where is the bathroom? / ¿Dónde está el baño?" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <button class="btn-add-confirm" style="margin-top:10px" onclick="importBulkPhrases()">📥 Importar frases</button>
     </div>
 
     <!-- LIST TOOLBAR -->
