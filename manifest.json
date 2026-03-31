@@ -1,0 +1,21 @@
+{
+  "name": "SpeakPro — Aprende Inglés",
+  "short_name": "SpeakPro",
+  "description": "Aprende inglés con flashcards SM-2, pronunciación con IA y conversación real",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080810",
+  "theme_color": "#6c63ff",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": ["education", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

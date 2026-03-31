@@ -4,7 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <script>if(location.hostname.includes('github.io')){location.replace('https://speakpro-hazel.vercel.app');}</script>
-<title>Speak English Pro</title>
+<title>SpeakPro — Aprende Inglés</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#6c63ff">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SpeakPro">
+<link rel="apple-touch-icon" href="/icon.svg">
+<!-- SEO -->
+<meta name="description" content="Aprende inglés con flashcards SM-2, pronunciación con IA y conversación real. Gratis.">
+
+<!-- Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  }
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -32,7 +52,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* NAV */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px}
 .nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
-.nav-logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:default}
+.nav-logo-icon{width:32px;height:32px;flex-shrink:0}
+.nav-logo-text{font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .nav-tabs{display:flex;gap:4px}
 .nav-tab{background:none;border:none;color:var(--muted);padding:8px 14px;border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
 .nav-tab.active{background:rgba(108,99,255,.15);color:var(--accent)}
@@ -550,7 +572,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <nav class="nav">
   <div class="nav-inner">
-    <div class="nav-logo">⚡ SpeakPro</div>
+    <div class="nav-logo">
+      <img class="nav-logo-icon" src="/icon.svg" alt="SpeakPro logo">
+      <span class="nav-logo-text">SpeakPro</span>
+    </div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('flashcards')">🃏 <span>Frases</span></button>
       <button class="nav-tab" onclick="showPage('dialogue')">🗣️ <span>Diálogos</span></button>
