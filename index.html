@@ -130,6 +130,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .btn-prev:hover{color:var(--text);transform:translateY(-2px)}
 @keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(108,99,255,.5)}50%{box-shadow:0 0 0 12px rgba(108,99,255,0)}}
 
+/* ANKI RECALL */
+.recall-cover{background:rgba(108,99,255,.07);border:1px dashed rgba(108,99,255,.25);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px}
+.recall-hint{font-size:13px;color:var(--muted);margin-bottom:14px}
+.btn-reveal{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;padding:13px 28px;border-radius:13px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;width:100%}
+.btn-reveal:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,99,255,.4)}
+.fc-answer{display:none}
+.fc-answer.revealed{display:block}
+
+/* COLLAPSIBLE SECTIONS */
+.collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:13px 16px;background:var(--card);border:1px solid var(--border);border-radius:13px;margin-bottom:8px;transition:border-color .2s;user-select:none}
+.collapsible-header:hover{border-color:rgba(108,99,255,.3)}
+.collapsible-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.collapsible-arrow{font-size:10px;color:var(--muted);transition:transform .2s}
+.collapsible-arrow.open{transform:rotate(180deg)}
+.collapsible-body{display:none;margin-bottom:8px}
+.collapsible-body.open{display:block}
+
+/* SHADOW ICON BTN */
+.btn-shadow-icon{background:none;border:1px solid var(--border);color:var(--muted);padding:13px 14px;border-radius:13px;cursor:pointer;font-size:16px;transition:all .2s;flex:0}
+.btn-shadow-icon:hover{border-color:var(--accent);color:var(--accent)}
+.btn-shadow-icon.on{background:rgba(108,99,255,.12);border-color:var(--accent);color:var(--accent)}
+
 /* NIVEL BADGES */
 .nivel-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:3px 9px;border-radius:100px;letter-spacing:.5px;margin-right:6px}
 .nivel-A1{background:rgba(0,245,160,.15);color:#00f5a0;border:1px solid rgba(0,245,160,.3)}
@@ -514,18 +536,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="page active" id="page-flashcards">
   <div class="container">
 
-    <div class="stats-row">
-      <div class="stat-box"><div class="num" id="s-learned">0</div><div class="lbl">Aprendidas ✅</div></div>
-      <div class="stat-box"><div class="num" id="s-total">0</div><div class="lbl">Total</div></div>
-      <div class="stat-box"><div class="num" id="s-streak">0</div><div class="lbl">Racha 🔥</div></div>
-      <div class="stat-box"><div class="num" id="s-score">-</div><div class="lbl">Pron. 🎤</div></div>
-    </div>
-
-    <div class="progress-track">
-      <div class="progress-top"><span>Progreso total</span><span id="prog-txt">0 / 0</span></div>
-      <div class="bar"><div class="bar-fill" id="prog-fill" style="width:0%"></div></div>
-    </div>
-
     <!-- SESSION HEADER -->
     <div class="session-header">
       <div class="session-progress">
@@ -548,26 +558,21 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button class="btn-explore" id="btn-explore" onclick="toggleExploreMode()">Explorar</button>
     </div>
 
-    <!-- LEVEL PROGRESS -->
-    <div class="level-progress">
-      <div class="lp-title">🎓 Tu progreso por nivel</div>
-      <div class="lp-grid" id="lp-grid">
-        <div class="lp-row lp-A1" onclick="filterByLevel('A1')"><span class="lp-lbl lp-A1">A1</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-A1" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-A1">0/0</span></div>
-        <div class="lp-row lp-A2" onclick="filterByLevel('A2')"><span class="lp-lbl lp-A2">A2</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-A2" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-A2">0/0</span></div>
-        <div class="lp-row lp-B1" onclick="filterByLevel('B1')"><span class="lp-lbl lp-B1">B1</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-B1" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-B1">0/0</span></div>
-        <div class="lp-row lp-B2" onclick="filterByLevel('B2')"><span class="lp-lbl lp-B2">B2</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-B2" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-B2">0/0</span></div>
-        <div class="lp-row lp-C1" onclick="filterByLevel('C1')"><span class="lp-lbl lp-C1">C1</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-C1" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-C1">0/0</span></div>
-      </div>
+    <!-- LEVEL PROGRESS (collapsible) -->
+    <div class="collapsible-header" onclick="toggleCollapsible('lp-body','lp-arrow')">
+      <div class="collapsible-header-left">🎓 Progreso por nivel</div>
+      <span class="collapsible-arrow" id="lp-arrow">▼</span>
     </div>
-
-    <!-- SHADOWING TOGGLE -->
-    <div class="shadow-toggle" id="shadow-toggle" onclick="toggleShadowMode()">
-      <div class="shadow-toggle-icon">🎧</div>
-      <div class="shadow-toggle-info">
-        <strong>Modo Shadowing</strong>
-        <span>Escucha y repite sin ver el texto — como los intérpretes</span>
+    <div class="collapsible-body" id="lp-body">
+      <div class="level-progress" style="margin-bottom:0">
+        <div class="lp-grid" id="lp-grid">
+          <div class="lp-row lp-A1" onclick="filterByLevel('A1')"><span class="lp-lbl lp-A1">A1</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-A1" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-A1">0/0</span></div>
+          <div class="lp-row lp-A2" onclick="filterByLevel('A2')"><span class="lp-lbl lp-A2">A2</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-A2" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-A2">0/0</span></div>
+          <div class="lp-row lp-B1" onclick="filterByLevel('B1')"><span class="lp-lbl lp-B1">B1</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-B1" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-B1">0/0</span></div>
+          <div class="lp-row lp-B2" onclick="filterByLevel('B2')"><span class="lp-lbl lp-B2">B2</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-B2" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-B2">0/0</span></div>
+          <div class="lp-row lp-C1" onclick="filterByLevel('C1')"><span class="lp-lbl lp-C1">C1</span><div class="lp-bar-bg"><div class="lp-bar-fill" id="lp-bar-C1" style="width:0%"></div></div><span class="lp-count" id="lp-cnt-C1">0/0</span></div>
+        </div>
       </div>
-      <div class="shadow-switch" id="shadow-switch"></div>
     </div>
 
     <input class="search-box" id="searchInput" placeholder="🔍 Buscar frase en inglés o español..." oninput="handleSearch()">
@@ -622,65 +627,70 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
 
       <div class="fc-pron" id="fc-pron">🔊 ...</div>
-      <div class="fc-es" id="fc-es"></div>
 
-      <div class="tip-box">
-        <div class="tip-icon">💡</div>
-        <div><div class="tip-lbl">Truco de memoria</div><div class="tip-txt" id="fc-tip"></div></div>
+      <!-- ANKI RECALL COVER -->
+      <div class="recall-cover" id="recall-cover">
+        <div class="recall-hint">Lee la frase en inglés — ¿la sabes? Luego revela la traducción</div>
+        <button class="btn-reveal" onclick="revealAnswer()">👁 Ver traducción</button>
       </div>
 
-      <div class="ex-title">Úsala en conversación:</div>
-      <div id="fc-exs"></div>
+      <!-- ANSWER (hidden until revealed) -->
+      <div class="fc-answer" id="fc-answer">
+        <div class="fc-es" id="fc-es"></div>
 
-      <!-- PRONUNCIATION RESULT -->
-      <div class="pronun-result" id="pronun-result">
-        <div class="score-row">
-          <div class="score-circle" id="score-circle">-</div>
-          <div class="score-msg" id="score-msg"></div>
+        <div class="tip-box">
+          <div class="tip-icon">💡</div>
+          <div><div class="tip-lbl">Truco de memoria</div><div class="tip-txt" id="fc-tip"></div></div>
         </div>
-        <div class="word-scores" id="word-scores"></div>
+
+        <div class="ex-title">Úsala en conversación:</div>
+        <div id="fc-exs"></div>
+
+        <!-- PRONUNCIATION RESULT -->
+        <div class="pronun-result" id="pronun-result">
+          <div class="score-row">
+            <div class="score-circle" id="score-circle">-</div>
+            <div class="score-msg" id="score-msg"></div>
+          </div>
+          <div class="word-scores" id="word-scores"></div>
+        </div>
+
+        <div class="sm2-btns" id="sm2-btns">
+          <button class="sm2-btn sm2-again" onclick="rateSM2(1)">🔴 Otra vez<span class="sm2-interval" id="sm2-t0">mañana</span></button>
+          <button class="sm2-btn sm2-hard" onclick="rateSM2(3)">🟡 Difícil<span class="sm2-interval" id="sm2-t1">+días</span></button>
+          <button class="sm2-btn sm2-good" onclick="rateSM2(4)">🟢 Bien<span class="sm2-interval" id="sm2-t2">+días</span></button>
+          <button class="sm2-btn sm2-easy" onclick="rateSM2(5)">⚡ Fácil<span class="sm2-interval" id="sm2-t3">+días</span></button>
+        </div>
+        <div class="sm2-section-label">¿Qué tan fácil fue esta frase?</div>
       </div>
 
       <div class="controls">
         <button class="btn btn-prev" onclick="prevCard()">◀</button>
         <button class="btn btn-speak" onclick="speakPhrase()" title="Escuchar">🔊</button>
         <button class="btn btn-mic" id="mic-btn" onclick="toggleMic()" title="Pronunciar">🎤</button>
+        <button class="btn-shadow-icon" id="shadow-icon-btn" onclick="toggleShadowMode()" title="Modo Shadowing">🎧</button>
       </div>
-      <div class="sm2-btns" id="sm2-btns">
-        <button class="sm2-btn sm2-again" onclick="rateSM2(1)">🔴 Otra vez<span class="sm2-interval" id="sm2-t0">mañana</span></button>
-        <button class="sm2-btn sm2-hard" onclick="rateSM2(3)">🟡 Difícil<span class="sm2-interval" id="sm2-t1">+días</span></button>
-        <button class="sm2-btn sm2-good" onclick="rateSM2(4)">🟢 Bien<span class="sm2-interval" id="sm2-t2">+días</span></button>
-        <button class="sm2-btn sm2-easy" onclick="rateSM2(5)">⚡ Fácil<span class="sm2-interval" id="sm2-t3">+días</span></button>
-      </div>
-      <div class="sm2-section-label">¿Qué tan fácil fue esta frase?</div>
       <div class="mic-hint" id="mic-hint">Toca 🎤 para practicar tu pronunciación con karaoke</div>
     </div>
 
-    <div class="side-grid">
-      <div class="side-card">
-        <div class="side-title">🔥 Racha actual</div>
-        <div class="streak-big" id="streak-big">0</div>
-        <div class="streak-sub">frases seguidas</div>
-      </div>
-      <div class="side-card">
-        <div class="side-title">📋 Para repasar</div>
-        <ul class="mini-list" id="review-list"><li>Nada aún 🎉<span></span></li></ul>
-      </div>
+    <!-- SM-2 DASHBOARD (collapsible) -->
+    <div class="collapsible-header" onclick="toggleCollapsible('sm2-body','sm2-arrow')">
+      <div class="collapsible-header-left">📅 Próximas revisiones</div>
+      <span class="collapsible-arrow" id="sm2-arrow">▼</span>
     </div>
-
-    <!-- SM-2 DASHBOARD -->
-    <div class="sm2-dash">
-      <div class="sm2-dash-title">📅 Próximas revisiones — 7 días</div>
-      <div class="review-week" id="review-week">
-        <div class="rw-day is-today"><div class="rw-count">·</div><div class="rw-lbl">Hoy</div></div>
-        <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">Mañ</div></div>
-        <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+2d</div></div>
-        <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+3d</div></div>
-        <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+4d</div></div>
-        <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+5d</div></div>
-        <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+6d</div></div>
+    <div class="collapsible-body" id="sm2-body">
+      <div class="sm2-dash" style="margin-top:0">
+        <div class="review-week" id="review-week">
+          <div class="rw-day is-today"><div class="rw-count">·</div><div class="rw-lbl">Hoy</div></div>
+          <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">Mañ</div></div>
+          <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+2d</div></div>
+          <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+3d</div></div>
+          <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+4d</div></div>
+          <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+5d</div></div>
+          <div class="rw-day"><div class="rw-count">·</div><div class="rw-lbl">+6d</div></div>
+        </div>
+        <div class="dash-projection" id="dash-projection">Empieza a calificar frases para ver tu proyección de aprendizaje.</div>
       </div>
-      <div class="dash-projection" id="dash-projection">Empieza a calificar frases para ver tu proyección de aprendizaje.</div>
     </div>
 
   </div>
@@ -1655,6 +1665,8 @@ function toggleShadowMode() {
   shadowMode = !shadowMode;
   const toggle = document.getElementById('shadow-toggle');
   if (toggle) toggle.classList.toggle('shadow-on', shadowMode);
+  const iconBtn = document.getElementById('shadow-icon-btn');
+  if (iconBtn) iconBtn.classList.toggle('on', shadowMode);
   if (shadowMode) {
     toast('🎧 Modo Shadowing ON — escucha y repite', false);
     startShadowCard();
@@ -1664,8 +1676,11 @@ function toggleShadowMode() {
     document.getElementById('shadow-card').classList.remove('show');
     document.getElementById('karaoke-wrap').style.display = '';
     document.getElementById('fc-pron').style.display = '';
-    document.getElementById('sm2-btns').style.display = '';
-    document.querySelector('.sm2-section-label').style.display = '';
+    // Restore recall cover (reset to un-revealed state)
+    const recallCover = document.getElementById('recall-cover');
+    const fcAnswer = document.getElementById('fc-answer');
+    if (recallCover) recallCover.style.display = '';
+    if (fcAnswer) { fcAnswer.style.display = ''; fcAnswer.classList.remove('revealed'); }
   }
 }
 
@@ -1676,9 +1691,12 @@ function startShadowCard() {
   // Hide normal elements
   document.getElementById('karaoke-wrap').style.display = 'none';
   document.getElementById('fc-pron').style.display = 'none';
-  document.getElementById('sm2-btns').style.display = 'none';
-  document.querySelector('.sm2-section-label').style.display = 'none';
   document.getElementById('pronun-result').classList.remove('show');
+  // Also hide recall cover and answer in shadow mode
+  const recallCover = document.getElementById('recall-cover');
+  const fcAnswer = document.getElementById('fc-answer');
+  if (recallCover) recallCover.style.display = 'none';
+  if (fcAnswer) fcAnswer.style.display = 'none';
 
   // Show shadow card
   const sc = document.getElementById('shadow-card');
@@ -2101,6 +2119,12 @@ function renderCard() {
   const words = p.en.split(' ');
   document.getElementById('karaoke-phrase').innerHTML = words.map((w, i) => `<span class="k-word idle" id="kw-${i}">${w}</span>`).join('');
 
+  // Reset Anki recall — hide answer until user taps "Ver traducción"
+  const answerEl = document.getElementById('fc-answer');
+  const coverEl = document.getElementById('recall-cover');
+  if (answerEl) answerEl.classList.remove('revealed');
+  if (coverEl) coverEl.style.display = '';
+
   // Reset pronunciation result
   document.getElementById('pronun-result').classList.remove('show');
   document.getElementById('mic-hint').textContent = 'Toca 🎤 para practicar tu pronunciación con karaoke';
@@ -2111,20 +2135,28 @@ function renderCard() {
 }
 
 function updateStats() {
-  document.getElementById('s-learned').textContent = learned.size;
-  document.getElementById('s-total').textContent = phrases.length;
-  document.getElementById('s-streak').textContent = streak;
+  // removed stats-row / progress-track / side-grid elements — update only what still exists
   const avg = avgScore.length ? Math.round(avgScore.reduce((a,b)=>a+b,0)/avgScore.length) : null;
-  document.getElementById('s-score').textContent = avg !== null ? avg + '%' : '-';
-  document.getElementById('prog-txt').textContent = `${learned.size} / ${phrases.length}`;
-  document.getElementById('prog-fill').style.width = `${(learned.size/phrases.length)*100}%`;
-  document.getElementById('streak-big').textContent = streak;
-  const rl = document.getElementById('review-list');
-  rl.innerHTML = hardList.length === 0 ? '<li>Nada aún 🎉<span></span></li>' : hardList.slice(0,4).map(p=>`<li>${p.en.length>22?p.en.slice(0,22)+'…':p.en}<span>Repasar</span></li>`).join('');
+  // session header is updated via updateSessionHeader(); nothing extra needed here
 }
 
 function nextCard() { if(!filtered.length) return; currentIdx = (currentIdx+1)%filtered.length; renderCard(); }
 function prevCard() { if(!filtered.length) return; currentIdx = (currentIdx-1+filtered.length)%filtered.length; renderCard(); }
+
+function revealAnswer() {
+  const answerEl = document.getElementById('fc-answer');
+  const coverEl = document.getElementById('recall-cover');
+  if (answerEl) answerEl.classList.add('revealed');
+  if (coverEl) coverEl.style.display = 'none';
+}
+
+function toggleCollapsible(bodyId, arrowId) {
+  const body = document.getElementById(bodyId);
+  const arrow = document.getElementById(arrowId);
+  if (!body) return;
+  body.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open');
+}
 
 // markKnown y markHard reemplazados por rateSM2() — algoritmo SM-2
 
@@ -2453,6 +2485,8 @@ function showPage(id) {
     clearTimeout(shadowTimer);
     const toggle = document.getElementById('shadow-toggle');
     if (toggle) toggle.classList.remove('shadow-on');
+    const iconBtn = document.getElementById('shadow-icon-btn');
+    if (iconBtn) iconBtn.classList.remove('on');
   }
   if (isRecording) stopRecognition();
   window.speechSynthesis && window.speechSynthesis.cancel();
