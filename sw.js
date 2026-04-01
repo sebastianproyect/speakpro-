@@ -1,4 +1,4 @@
-const CACHE = 'speakpro-v1';
+const CACHE = 'speakpro-v2';
 const ASSETS = ['/', '/index.html', '/icon.svg', '/manifest.json'];
 
 // Instalación: guardar archivos en caché
